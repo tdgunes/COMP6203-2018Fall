@@ -5,7 +5,7 @@
                         _Thursday, 20 September 2018_
                         University of Southampton
 
-
+This lab aims to give an introduction to *Automated Negotiation* and the simulation environment for negotiation, *GENIUS*. At the end of this lab, you will have a brief idea about the area and keywords such as:  `preference profile`, `domain`, `negotiation protocol` and so on.
 
 
 # Designing a Negotiation Party
@@ -30,7 +30,7 @@ To approach this _negotiation problem_, to be a good negotiator, you may conside
 * Generating a variety of possibilities before deciding what to do.
 * Paying a lot of attention to the flow of negotiation.
 
-## Introduction
+## Short Introduction
 
 To approach this problem from a computer science perspective, in the field of *Automated Negotiation*, this problem is modelled in various ways. To give a brief introduction to these models, assume that there are: 
 
@@ -45,9 +45,112 @@ To approach this problem from a computer science perspective, in the field of *A
 * **A protocol** how the negotiation is going to take place.
 	* e.g. [Round-robin](https://en.wikipedia.org/wiki/Round-robin_tournament) fashion, a mediator based
 
+******************************************************************************
+*┌─ Negotiation Environment─────────────────────────────────────────────────┐*
+*│                                                                          │*
+*│ ┌── Agent n ───────────────────────────┐                                 │*
+*│ │┌── Agent b ──────────────────────────┴┐  ┌─ Deadline ─┐┌─ Protocol ───┐│*
+*│ ││┌── Agent a ──────────────────────────┴┐ │  2 hours   ││ Round-robbin ││*
+*│ │││                                      │ └────────────┘└──────────────┘│*
+*│ │││ ┌─ Preference Profile ────────────┐  │                               │*
+*│ │││ │                                 │  │ ┌─ Domain ───────────────────┐│*
+*│ │││ │  ┌─ Food ───────────────────┐   │  │ │                            ││*
+*│ │││ │  │                          │   │  │ │┌ Food ────────────────────┐││*
+*│ │││ │  │ Fries > Pizza > Hamburger│   │  │ ││ ┌─────┐┌─────┐┌─────────┐│││*
+*│ │││ │  │                          │   │  │ ││ │Fries││Pizza││Hamburger││││*
+*│ │││ │  └──────────────────────────┘   │  │ ││ └─────┘└─────┘└─────────┘│││*
+*│ │││ │                                 │  │ │└──────────────────────────┘││*
+*│ │││ │  ┌─ Day ────────────────────┐   │  │ │                            ││*
+*│ │││ │  │                          │   │  │ │┌ Day ─────────────────────┐││*
+*│ │││ │  │ Monday > Sunday > Friday │   │  │ ││ ┌──────┐┌──────┐┌──────┐ │││*
+*│ │││ │  │                          │   │  │ ││ │Monday││Sunday││Friday│ │││*
+*│ │││ │  └──────────────────────────┘   │  │ ││ └──────┘└──────┘└──────┘ │││*
+*│ │││ │                                 │  │ │└──────────────────────────┘││*
+*│ └┤│ └─────────────────────────────────┘  │ └────────────────────────────┘│*
+*│  └┤                                      │                               │*
+*│   └──────────────────────────────────────┘                               │*
+*└──────────────────────────────────────────────────────────────────────────┘*
+******************************************************************************
+[Figure [negotiation environment]: A simple negotiation environment]
 
 
 
+**************************************************************************
+*                ┌──────────────────┐                                    *
+*          Λ  ┌─▶│ I desire Friday! │   Λ                                *
+* Agent C ▕ ▏─┘  └──────────────────┘  ▕ ▏──┐ Agent B                    *
+*          V ┌─────────────────────────┐V   │                            *
+*            │                         │┌───┘                            *
+*            │                         ││  ┌────────────────────────────┐*
+*            │   Negotiation Table     ││  │  I am OK with any type of  │*
+*            │                         │└─▶│ food, but let's have it on │*
+*            │                         │   │ Sunday or Monday, please!  │*
+*            └─────────────────────────┘   └────────────────────────────┘*
+*                         Λ    ┌────────────────────────────┐            *
+*                Agent A ▕ ▏─┐ │ I prefer Pizza on Sundays, │            *
+*                         V  └▶│   Hamburgers on Fridays.   │            *
+*                              └────────────────────────────┘            *
+**************************************************************************
+[Figure [negotiation session]: A negotiation session between three agents]
+
+# Lab Task 1: Set up GENIUS Environment 
+
+Throughout this module, you are expected to implement _a negotiating agent_. You are expected to use `Java` programming language in the automated negotiation simulation platform [GENIUS](http://ii.tudelft.nl/genius/).
+
+## Prerequisites 
 
 
-<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+### Software Prerequisites 
+* [`Java Development Kit 8`](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* [`GENIUS 9.1.1`](http://ii.tudelft.nl/genius/sites/default/files/genius-9.1.1.zip)
+
+### Resources
+* [`Java Cheatsheet`](https://introcs.cs.princeton.edu/java/11cheatsheet/) _Remember/learn the basics of Java programming language._
+* [`GENIUS Manual`](https://tracinsy.ewi.tudelft.nl/pub/svn/Genius/doc/userguide.pdf) _Official user guide, detailed explanations about the simulation platform_ 
+* [`Unofficial GENIUS 9.1.1 Javadoc`](https://tdgunes.com/genius-9.1.1-javadoc/index.html) _Shows Java API of GENIUS, while you are implementing your agent, you can have a look at the method definitions when necessary here._
+
+## Installation 
+
+There are three different options to follow to set up the simulation environment. If you want to set the environment from scratch follow `Option 1`. We recommend `Intellij` Java IDE for implementation. If you are more experienced with Eclipse, you can follow `Option 3`.
+
+### Option 1
+You can watch the video below which explains how to set it up from scratch with using Intellij. 
+
+![Figure [video]: How to set up Genius from scratch](https://www.youtube.com/watch?v=ES_bpdRiSNM)
+
+Index of the video:
+
+* 0:00 Introduction & Checking Java Installation 
+* 0:49 Java IDE Installation
+* 1:05 Downloading Genius (Simulation Environment)
+* 1:35 Creating a project and compiling ExampleAgent 
+* 3:30 Running Genius GUI
+* 4:20 Adding ExampleAgent to Genius
+* 4:35 Running a single negotiation session
+* 5:19 Running a tournament (a set of negotiation sessions)
+* 5:55 Checking logs of a tournament 
+* 6:32 Setting up automatic compilation for Intellij 
+
+
+### Option 2
+You can simply clone (or [download as a zip archive](https://github.com/tdgunes/ExampleAgent/archive/master.zip)) this repository (latest version of Genius included) with version control system `git` by:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ sh
+git clone https://github.com/tdgunes/ExampleAgent.git
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+and import the ExampleAgent folder as a project to Intellij (other major Java IDEs also should work). 
+
+
+### Option 3
+
+You can follow the steps from the [official manual](https://tracinsy.ewi.tudelft.nl/pub/svn/Genius/doc/userguide.pdf), in Section 12.
+<!-- Markdeep: -->
+<script>window.markdeepOptions = {"tocStyle": "medium"};
+</script>
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+
+
+# Lab Task 2: Run GENIUS with ExampleAgent
+
+Follow the steps on the video given above and run ExampleAgent in GENIUS with some opponent agents. You need to validate that your environment for development is ready.
