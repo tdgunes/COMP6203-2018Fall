@@ -38,8 +38,10 @@ To approach this problem from a computer science perspective, in the field of *A
 	* e.g. _negotiating parties_, _humans_ or _software agents_
 * **A domain** is the context the agents are negotiating in.
 	* e.g. _example above: organizing parties_, negotiating a business deal_, _smart grids, negotiating the electric prices_
+* **An issue** is a troubling point that requires negotiation.
+    * e.g.  
 * **Preference profiles** a set of profiles, that captures individuals preferences
-    * e.g. If the domain is _party_, assume that Agent A prefers *Pizza* over *Hamburger* for **Food**. Agent B prefers *Hamburger* over *Pizza*.   
+    * e.g. If the domain is _party_, assume that Agent A prefers *Pizza* over *Hamburger* for **Food**. Agent B prefers *Hamburger* over *Pizza*.  
 * **A deadline** when the negotiation halts. 
 	* e.g. 1 hour, 2000 rounds (will be explained later)
 * **A protocol** how the negotiation is going to take place.
@@ -49,11 +51,11 @@ To approach this problem from a computer science perspective, in the field of *A
 *┌─ Negotiation Environment─────────────────────────────────────────────────┐*
 *│                                                                          │*
 *│ ┌── Agent n ───────────────────────────┐                                 │*
-*│ │┌── Agent b ──────────────────────────┴┐  ┌─ Deadline ─┐┌─ Protocol ───┐│*
+*│ │┌── Agent b ──────────────────────────┴┐  ┌────────────┐┌──────────────┐│*
 *│ ││┌── Agent a ──────────────────────────┴┐ │  2 hours   ││ Round-robbin ││*
 *│ │││                                      │ └────────────┘└──────────────┘│*
-*│ │││ ┌─ Preference Profile ────────────┐  │                               │*
-*│ │││ │                                 │  │ ┌─ Domain ───────────────────┐│*
+*│ │││ ┌─ Desires ───────────────────────┐  │                               │*
+*│ │││ │                                 │  │ ┌─ Party ────────────────────┐│*
 *│ │││ │  ┌─ Food ───────────────────┐   │  │ │                            ││*
 *│ │││ │  │                          │   │  │ │┌ Food ────────────────────┐││*
 *│ │││ │  │ Fries > Pizza > Hamburger│   │  │ ││ ┌─────┐┌─────┐┌─────────┐│││*
@@ -71,34 +73,40 @@ To approach this problem from a computer science perspective, in the field of *A
 *│   └──────────────────────────────────────┘                               │*
 *└──────────────────────────────────────────────────────────────────────────┘*
 ******************************************************************************
-[Figure [negotiation environment]: A simple negotiation environment]
+[Figure [environment]: A simple negotiation environment]
 
+!!! note
+    **Practice**: Try to match the terms in Figure [environment] with definitions.
 
+********************************************************************************
+*                      ┌──────────────────┐                                    *
+*                Λ  ┌─▶│ I desire Friday! │   Λ                                *
+*       Agent C ▕ ▏─┘  └──────────────────┘  ▕ ▏──┐ Agent B                    *
+*                V ┌─────────────────────────┐V   │                            *
+*                │ │                         │┌───┘                            *
+*         ┌──────┘ │                         ││  ┌────────────────────────────┐*
+*         ▼        │  Negotiation Table      ││  │  I am ok with any type of  │*
+*┌────────────────┐│                         │└─▶│ food, but let's have it on │*
+*│Perhaps Sunday? ││                         │   │ Sunday or Monday, please!  │*
+*└────────────────┘└─────────────────────────┘   └────────────────────────────┘*
+*                               Λ    ┌────────────────────────────┐            *
+*                      Agent A ▕ ▏─┐ │ I prefer Pizza on Sundays, │            *
+*                               V  └▶│   Hamburgers on Fridays.   │            *
+*                                    └────────────────────────────┘            *
+********************************************************************************
+[Figure [negotiation]: A negotiation session between three agents]
 
-**************************************************************************
-*                ┌──────────────────┐                                    *
-*          Λ  ┌─▶│ I desire Friday! │   Λ                                *
-* Agent C ▕ ▏─┘  └──────────────────┘  ▕ ▏──┐ Agent B                    *
-*          V ┌─────────────────────────┐V   │                            *
-*            │                         │┌───┘                            *
-*            │                         ││  ┌────────────────────────────┐*
-*            │   Negotiation Table     ││  │  I am OK with any type of  │*
-*            │                         │└─▶│ food, but let's have it on │*
-*            │                         │   │ Sunday or Monday, please!  │*
-*            └─────────────────────────┘   └────────────────────────────┘*
-*                         Λ    ┌────────────────────────────┐            *
-*                Agent A ▕ ▏─┐ │ I prefer Pizza on Sundays, │            *
-*                         V  └▶│   Hamburgers on Fridays.   │            *
-*                              └────────────────────────────┘            *
-**************************************************************************
-[Figure [negotiation session]: A negotiation session between three agents]
+!!! note
+    **Practice**: What will be the best possible scenario that all agents might agree on in Figure [negotiation]?
 
-# Lab Task 1: Set up GENIUS Environment 
+# Task 1: Set up GENIUS Environment 
 
 Throughout this module, you are expected to implement _a negotiating agent_. You are expected to use `Java` programming language in the automated negotiation simulation platform [GENIUS](http://ii.tudelft.nl/genius/).
 
 ## Prerequisites 
 
+!!! warning
+    Make sure that you have downloaded and installed the exact versions of prerequisites. Newer Java versions known to have some issues with GENIUS 9.1.1. 
 
 ### Software Prerequisites 
 * [`Java Development Kit 8`](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
@@ -107,7 +115,7 @@ Throughout this module, you are expected to implement _a negotiating agent_. You
 ### Resources
 * [`Java Cheatsheet`](https://introcs.cs.princeton.edu/java/11cheatsheet/) _Remember/learn the basics of Java programming language._
 * [`GENIUS Manual`](https://tracinsy.ewi.tudelft.nl/pub/svn/Genius/doc/userguide.pdf) _Official user guide, detailed explanations about the simulation platform_ 
-* [`Unofficial GENIUS 9.1.1 Javadoc`](https://tdgunes.com/genius-9.1.1-javadoc/index.html) _Shows Java API of GENIUS, while you are implementing your agent, you can have a look at the method definitions when necessary here._
+* [_Unofficial_ `GENIUS 9.1.1 Javadoc`](https://tdgunes.com/genius-9.1.1-javadoc/index.html) _Shows Java API of GENIUS, while you are implementing your agent, you can have a look at the method definitions when necessary here._
 
 ## Installation 
 
@@ -145,12 +153,16 @@ and import the ExampleAgent folder as a project to Intellij (other major Java ID
 ### Option 3
 
 You can follow the steps from the [official manual](https://tracinsy.ewi.tudelft.nl/pub/svn/Genius/doc/userguide.pdf), in Section 12.
+
+
+# Task 2: Run GENIUS with ExampleAgent
+
+Follow the steps on the video given above and run ExampleAgent in GENIUS with some opponent agents. You need to validate that your development environment is ready.
+
+
+
 <!-- Markdeep: -->
 <script>window.markdeepOptions = {"tocStyle": "medium"};
 </script>
 <style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
 
-
-# Lab Task 2: Run GENIUS with ExampleAgent
-
-Follow the steps on the video given above and run ExampleAgent in GENIUS with some opponent agents. You need to validate that your environment for development is ready.

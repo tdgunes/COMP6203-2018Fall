@@ -1,0 +1,257 @@
+              <meta charset="utf-8" emacsmode="-*- markdown -*-">
+
+                            **COMP6203: Lab #2**
+                        	Intelligent Agents
+                        _Thursday, 27 September 2018_
+                        University of Southampton
+
+This lab introduces the concepts: bids, issues, preference profiles and utility spaces in detail.
+
+
+# Theory Crash Course
+
+This section provides the essential theory to understand the negotiation process. In the next section, API definitions will be provided.  
+
+## Domain: Bids, Issues, Values
+
+A `domain` $D$ specification determines what type of offers that can be made by the agents during negotiation. For instance, agents are to negotiate on what type of laptop to purchase, a domain that describes this negotiation can be:
+
+******************************************************************************
+*+-----------------------------------------------+                           *
+*|                +-------------+                |      Issue #1             *
+*|                |    Brand    |<---------------+--------------             *
+*|                +------+------+                |                           *
+*|                       |                       |                           *
+*|           +-----------+-----------+           |                           *
+*|           v           v           v           |                           *
+*|      +--------+  +---------+ +---------+      |      Issue #1's Values    *
+*|      |  Dell  |  |  Apple  | |   HP    |<-----+------------------------   *
+*|      +--------+  +---------+ +---------+      |                           *
+*|                                               |                           *
+*|               +-----------------+             |         Issue #2          *
+*|               |    Hard Disk    |<------------+-----------------          *
+*|               +--------+--------+             |                           *
+*|                        |                      |                           *
+*|          +-------------+-------------+        |                           *
+*|          v             v             v        |                           *
+*|     +---------+   +---------+   +---------+   |         Issue #2's Values *
+*|     | 256 GB  |   | 512 GB  |   |  1 TB   |<--+---------------------------*
+*|     +---------+   +---------+   +---------+   |                           *
+*+-----------------------------------------------+                           *
+******************************************************************************
+[Figure [domain]: An example domain for laptop negotiation]
+
+A domain contains $n$ issues: 
+
+\begin{equation}
+D = (I_1, ..., I_n)
+\end{equation}
+
+Each issue $i$ consists of $k$ values:
+
+\begin{equation}
+I_i = (v^{i}_1, ..., v^{i}_k)
+\end{equation}
+
+An offer from an agent $a$ that can be formulated as choices $c$:
+
+\begin{equation}
+b_{a} = (v^{i}_{c_i}, ... v^{n}_{c_n})
+\end{equation}
+
+
+**Example**: With this notation, to define Figure [domain] formally with additional issue $Monitor$:
+
+\begin{equation}
+D_{laptop} = (Brand, HardDisk) \\ 
+I_{Brand} = (Dell, Apple, HP) \\ 
+I_{HardDisk} = (256GB, 512GB, 1TB) \\ 
+I_{Monitor} = (13^{"}, 15^{"}, 17^{"}) \\ 
+\label{domainlaptop}
+\end{equation}
+
+The agent $a$ can generate a bid $b$ as:
+
+\begin{equation}
+b_{a} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{13}^{"}) 
+\end{equation}
+
+## Preference Profiles, Utility Spaces
+
+Following the example the bid, let's assume that there are only two agents: Agent $a$ and Agent $b$ negotiating about *which laptop to buy*.
+
+1. Agent $a$ makes an offer: $b_{a} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{13}^{"})$
+2. When Agent $b$ observes the offer, the question is: how preferable is the bid $b_{a}$ for Agent $b$?
+
+Each agent has their own preferences for each issue. In this example, for instance: 
+
+* Agent $a$ prefers **a more portable laptop with high storage**. 
+* Agent $b$'s only requirement is **a larger screen** in a laptop.
+
+We say each agent has a _preference profile_ that represents these preferences. Each participant agent has their own profile. There are many types of different profiles[^oprof], the two we are going to focus are:
+
+* **Additive Utility Space**: The space is additive, when a bid is evaluated, this space can generate a total utility. 
+* **Partially Ordered Space[^pop]**: Instead of assigning utility value to bid, this space stores a partial order of values. By partial ordering, the available information about the preferences of an agent is that for some bid $X$ is preferred over bid $Y$ for a subset of the possible bids.
+
+### Additive Utility Space
+
+Formally the utility of a bid is calculated as:
+
+\begin{equation}
+U(b_a) = \sum_{i=1}^{n} \omega_i \frac{eval(v^{i}_{c_i})}{max(eval(I_i))}
+\end{equation}
+
+Let's again assume, our agent is working in `Laptop` domain (as defined in Equation $\ref{domainlaptop}$).
+
+**************************************************************************************
+*                                                    +----------------------------+  *
+*                                                    |   +--------------------+   |  *
+*                                                    |   | Evaluator: Laptop  |   |  *
+*    +-----------------------------------------+     |   |                    |   |  *
+*    |            +-------------+              |     |   | $w_{Brand}$ = 0.1  |   |  *
+*    |            |    Brand    |<-------------+-----+---|                    |   |  *
+*    |            +------+------+              |     |   |   eval(Dell) = 2   |   |  *
+*    |                   |                     |     |   |  eval(Apple) = 2   |   |  *
+*    |       +-----------+-----------+         |     |   |    eval(HP) = 2    |   |  *
+*    |       v           v           v         |     |   +--------------------+   |  *
+*    |  +--------+  +---------+ +---------+    |     |                            |  *
+*    |  |  Dell  |  |  Apple  | |   HP    |    |     |   +--------------------+   |  *
+*    |  +--------+  +---------+ +---------+    |     |   |Evaluator: Hard Disk|   |  *
+*    |                                         |     |   |                    |   |  *
+*    |           +-----------------+           |     |   |$w_{HardDisk}$ = 0.1|   |  *
+*    |           |    Hard Disk    |<----------+-----+---|                    |   |  *
+*    |           +--------+--------+           |     |   |  eval(256GB) = 2   |   |  *
+*    |                    |                    |     |   |  eval(512GB) = 1   |   |  *
+*    |      +-------------+-------------+      |     |   |   eval(1TB) = 1    |   |  *
+*    |      v             v             v      |     |   +--------------------+   |  *
+*    | +---------+   +---------+   +---------+ |     |                            |  *
+*    | | 256 GB  |   | 512 GB  |   |  1 TB   | |     |   +--------------------+   |  *
+*    | +---------+   +---------+   +---------+ |     |   | Evaluator: Monitor |   |  *
+*    |                                         |     |   |                    |   |  *
+*    |           +-----------------+           |     |   |$w_{Monitor}$ = 0.8 |   |  *
+*    |           |     Monitor     |<----------+-----+---|                    |   |  *
+*    |           +--------+--------+           |     |   |  eval(13") = 0.10  |   |  *
+*    |                    |                    |     |   |  eval(15") = 0.25  |   |  *
+*    |      +-------------+-------------+      |     |   |  eval(17") = 0.65  |   |  *
+*    |      v             v             v      |     |   +--------------------+   |  *
+*    | +---------+   +---------+   +---------+ |     +----------------------------+  *
+*    | |   13"   |   |   15"   |   |   17"   | |      Agent B's AdditiveUtilitySpace *
+*    | +---------+   +---------+   +---------+ |                                     *
+*    +-----------------------------------------+                                     *
+*                 Domain: Laptop                                                     *
+**************************************************************************************
+[Figure [agentbpref]: Preference Profile of Agent $b$ (instantiated with _AdditiveUtilitySpace_)]
+
+!!! note
+    **Practice[^answer1]**: Calculate the utility of $b_{a} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{13}^{"})$ for Agent $b$. 
+
+### Partially Ordered Space
+
+!!! WARNING
+    The implementation of this space is still in progress. 
+
+We expect there will three parameters of such space that will control the generation of bids:
+
+* **comparisons**: a subset of bids that are selected randomly from all possible bids that are assumed to be visible.
+* **errors**: the number of errors in the orders
+
+We will get back to this preference profile type in the next labs.
+
+[^oprof]: Genius User Guide mentions: `ConstraintUtilitySpace` and `NonlinearUtilitySpace`.
+
+[^pop]: It is expected that [ANAC 2019](http://web.tuat.ac.jp/~katfuji/ANAC2018/) (Automated Negotiation Competition) is going to include partially ordered preference profiles. 
+
+
+# Task 1: The laptop domain and preferences in GENIUS
+
+You are expected to create the same domain as shown in Figure [agentbpref] in GENIUS.
+
+!!! WARNING
+    There is already a laptop domain included in GENIUS. Use **lab2_laptop** as the name for the new domain.
+
+![Figure [step1]: Right click to the left bar](pic1.png width="500px")
+
+## Add the preference profiles to the domain
+
+After saving the domain with issues create a preference profile for Agent B and an arbitrary profile for Agent A.
+
+![Figure [step2]: Right click to domain's name](pic2.png width="500px")
+
+## Double check the created XML
+
+When you create the preference profiles and the domain, have a look at the created XML files. They are by default located at:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~sh
+{PROJECT_WORKING_DIRECTORY}/genius/templates/lab2_laptop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Check whether `lab2_laptop_util1.xml` is similar as below:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~xml
+<utility_space>
+    <objective name="lab2_laptop" index="0" description="" etype="objective" type="objective">
+        <issue vtype="discrete" name="Brands" index="1" etype="discrete" type="discrete">
+            <item evaluation="2.0" index="1" value="Dell"></item>
+            <item evaluation="2.0" index="2" value="Apple"></item>
+            <item evaluation="2.0" index="3" value="HP"></item>
+        </issue>
+        <issue vtype="discrete" name="Monitor" index="2" etype="discrete" type="discrete">
+            <item evaluation="10.0" index="1" value="13"></item>
+            <item evaluation="20.0" index="2" value="15"></item>
+            <item evaluation="65.0" index="3" value="17"></item>
+        </issue>
+        <issue vtype="discrete" name="Hard Drive" index="3" etype="discrete" type="discrete">
+            <item evaluation="2.0" index="1" value="256GB"></item>
+            <item evaluation="1.0" index="2" value="512GB"></item>
+            <item evaluation="1.0" index="3" value="1TB"></item>
+        </issue>
+        <weight index="1" value="0.1"></weight>
+        <weight index="2" value="0.1"></weight>
+        <weight index="3" value="0.8"></weight>
+    </objective>
+    <discount_factor value="1.0"></discount_factor>
+    <reservation value="0.0"></reservation>
+</utility_space>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[Figure [xmlsnippet]: Contents of `lab2_laptop_util1.xml`]
+
+# Task 2: Accessing the preference profile via API
+
+Copy paste the code snippet below `init(NegotiationInfo info)` method of your agent: 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+AbstractUtilitySpace utilitySpace = info.getUtilitySpace();
+AdditiveUtilitySpace additiveUtilitySpace = (AdditiveUtilitySpace) utilitySpace;
+
+List<Issue> issues = additiveUtilitySpace.getDomain().getIssues();
+
+for (Issue issue : issues) {
+    int issueNumber = issue.getNumber();
+    System.out.println(">> " + issue.getName() + " weight: " + additiveUtilitySpace.getWeight(issueNumber));
+
+    // Assuming that issues are discrete only
+    IssueDiscrete issueDiscrete = (IssueDiscrete) issue;
+    EvaluatorDiscrete evaluatorDiscrete = (EvaluatorDiscrete) additiveUtilitySpace.getEvaluator(issueNumber);
+
+    for (ValueDiscrete valueDiscrete : issueDiscrete.getValues()) {
+        System.out.println(valueDiscrete.getValue());
+        System.out.println("Evaluation(getValue): " + evaluatorDiscrete.getValue(valueDiscrete));
+        try {
+            System.out.println("Evaluation(getEvaluation): " + evaluatorDiscrete.getEvaluation(valueDiscrete));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+!!! note
+    Run a single negotiation session and validate if your agent can access the preference profile or not.
+
+[^answer1]: _ϛ6˙0 sᴉ ɹǝʍsuɐ ǝɥʇ_ 
+
+<!-- Markdeep: -->
+<script>window.markdeepOptions = {"tocStyle": "medium"};
+</script>
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+
