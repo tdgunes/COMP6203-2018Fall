@@ -63,7 +63,7 @@ b_{a} = (v^{i}_{c_i}, ... v^{n}_{c_n})
 **Example**: With this notation, to define Figure [domain] formally with additional issue $Monitor$:
 
 \begin{equation}
-D_{laptop} = (Brand, HardDisk) \\ 
+D_{laptop} = (Brand, HardDisk, Monitor) \\ 
 I_{Brand} = (Dell, Apple, HP) \\ 
 I_{HardDisk} = (256GB, 512GB, 1TB) \\ 
 I_{Monitor} = (13^{"}, 15^{"}, 17^{"}) \\ 
@@ -147,15 +147,34 @@ Let's again assume, our agent is working in `Laptop` domain (as defined in Equat
 
 ### Partially Ordered Space
 
-!!! WARNING
-    The implementation of this space is still in progress. 
-
 We expect there will three parameters of such space that will control the generation of bids:
 
 * **comparisons**: a subset of bids that are selected randomly from all possible bids that are assumed to be visible.
-* **errors**: the number of errors in the orders
+* _**errors**: the number of errors in the orders_ 
 
-We will get back to this preference profile type in the next labs.
+!!! WARNING
+    **errors** parameter is not used for now, assume that it is always zero.
+
+With regards to our previous example, if the comparisons equal to the number of possible bids (in $D_{laptop}$, the number of bids are: $\prod^{k}_{i}|I_i|$, which is $27$), the negotiating agent can observe all the possible bids:
+
+
+\begin{equation}
+B_a^{ordered} = (b_a^{1},b_a^{2},b_a^{3}, ..., b_a^{27})
+\end{equation}
+
+B_a is sorted by the utility of the each bid starts, from lowest to highest, can be such as:
+
+\begin{equation}
+b_a^{1} < b_a^{2} < b_a^{3} \leq ... \leq b_a^{27}
+\end{equation}
+
+The list may include bids with same utilities consecutively. Whenever parameter **comparisons** is set to some value, assume that it is $4$. Four bids will be randomly sampled from $B_a$. Then, the agent can only observe, for instance:
+
+\begin{equation}
+randomly\_sample(B_a^{ordered}, 4) = (b_a^{21},b_a^{10},b_a^{4}, b^{5})
+\end{equation}
+
+With negotiation sessions that has partially ordered space as uncertainty, the agent needs to reason and predict about the other unknown parts of the space. Also, since the utilities of each bid are unknown too, from by observing the order the negotiating agent may need to predict the utilities of the other bids too.
 
 [^oprof]: Genius User Guide mentions: `ConstraintUtilitySpace` and `NonlinearUtilitySpace`.
 
@@ -217,6 +236,7 @@ Check whether `lab2_laptop_util1.xml` is similar as below:
 
 # Task 2: Accessing the preference profile via API
 
+## AdditiveUtilitySpace Exercise
 Copy paste the code snippet below `init(NegotiationInfo info)` method of your agent: 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
@@ -247,6 +267,28 @@ for (Issue issue : issues) {
 
 !!! note
     Run a single negotiation session and validate if your agent can access the preference profile or not.
+
+## Partially Ordered Space Exercise
+
+This time, in this space only the preference order of some bids are observed. To access the ranking list of these bids, we use [`userModel field`](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/uncertainty/UserModel.html) of [`AbstractNegotiationParty class`](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/parties/AbstractNegotiationParty.html):
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+List<Bid> bids = userModel.getBidRanking().getBidOrder();
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+!!! note
+    Run a single negotiation session with partially ordered spaces for laptop domain and check if you can access them. 
+
+Also try to access the properties of a bid, using [`Bid class`](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/Bid.html):
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+List<Issue> issuesList = bid.getIssues();
+
+for (Issue issue : issuesList) {
+    System.out.println(issue.getName() + ": " + bid.getValue(issue.getNumber()));
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 [^answer1]: _ϛ6˙0 sᴉ ɹǝʍsuɐ ǝɥʇ_ 
 

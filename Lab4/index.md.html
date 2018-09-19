@@ -1,0 +1,136 @@
+              <meta charset="utf-8" emacsmode="-*- markdown -*-">
+
+                            **COMP6203: Lab #4**
+                        	Intelligent Agents
+                        _Monday, 1 October 2018_
+                        University of Southampton
+
+This lab shows how a previous winner ([ANAC2016](http://web.tuat.ac.jp/~katfuji/ANAC2016/)) of the international automated negotiation competition.
+
+# Theory Crash Course
+
+To get you more familiar with how to implement a more sophisticated agent, we introduce `Caduceus` agent, which got the first in 2016 and a slightly different version got the second in 2017.
+
+To learn theory, have a look at:
+* [The conference paper](https://link.springer.com/chapter/10.1007/978-3-319-69131-2_27) [#Gunes2017]
+* [The poster](https://tdgunes.com/prima2017poster.pdf)
+* [The presentation](https://tdgunes.com/prima2017presentation.pdf)
+
+of the Caduceus. 
+
+In short, Caduceus incorporates the strategies of multiple agents. We call it experts. These experts can be agents that we know that they are good in negotiation. Metaphorically, it is as if you ask help from multiple friends and try to combine their opinions.
+
+This type of combined approaches exist in:
+* Machine Learning
+    * [Ensemble Learning](https://en.wikipedia.org/wiki/Ensemble_learning)
+    * Algorithm portfolios 
+* Artificial Intelligence 
+    * Genetic Algorithms (_slightly similar_)
+    * Mixture of Experts
+
+Essentially, Caduceus has _a set of experts $A$._ 
+
+\begin{equation}
+A = \{a_i, ..., a_n \}
+\end{equation}
+
+A set of _impact_ weights each assigned to the experts.
+
+\begin{equation}
+\Omega = \{\omega_i, ..., \omega_n \}
+\end{equation}
+
+Therefore, Caduceus' algorithm _IPO variation_ a slightly easier to implement version for generating bids is:
+
+* $B \leftarrow \{\}$
+* **for each** $i \in A$ **do**
+    * $a^{'}_i \leftarrow$ query agent $i$ with action $a$ in time $t$
+    * **if** $type(a^{'}_i) = I^{bid}$ **then**
+        * $B \leftarrow B \cup \{a^{'}_i\}$
+        * $\ell_{bid} \leftarrow \ell_{bid} + 1$
+    * **else**
+        * $\ell_{accept} \leftarrow \ell_{accept} + 1$
+* **if** $\ell_{accept}  > \ell_{bid}$ **then return** $I^{accept}$
+* **else**
+    **return** a bid $b^{'}$ from [weighted random sample set](https://stackoverflow.com/questions/6052603/fast-weighted-random-selection-from-very-large-set-of-values) $B$ according to $\Omega$
+
+where:
+
+* $\ell_{accept}$: the number of experts that generates _accept action_, 
+    * i.e. the number of experts that recommend accepting the offer that is on the table
+* $\ell_{bid}$: the number of experts that generates _bid action_ 
+    * i.e. the number of experts that recommend making a counter offer
+* $a^{'}_i$: action that agent i recommends to Caduceus to take
+
+# Task 1: Implement IPO version of Caduceus
+
+
+!!! warning
+    Make sure the expert agents set are receiving the messages from the opponent agents.
+
+!!! warning
+    You can pick your experts from previous competitions. But be careful, if you are going to use agents from:
+        * From ANAC 2016: agents protocol became SOAP
+        * From ANAC 2017: agents can access data from their past negotiations form a tournament. Check the details [here](http://web.tuat.ac.jp/~katfuji/ANAC2017/).
+        * From ANAC 2019 (upcoming): agents which can work with partially ordered preference profiles will be used, protocol is expected to be bilateral version of SOAP.
+
+# Task 2: Implement CO version of Caduceus
+
+Implement _Crossover Strategy_ of Caduceus: Algorithm 1.2 without _waiting phase_ from the paper. 
+
+**********************************************************************************
+*                          +---------+--------+                                  *
+*                          |    Issue|HP      |                                  *
+*                          +---------+--------+                                  *
+*                          |    Brand|512GB   |                                  *
+*                          +---------+--------+                                  *
+*                          |HardDrive|17"     |                                  *
+*                          +---------+--------+                                  *
+*                                    ^                                           *
+*                                    |                                           *
+*                                    | combines opinons                          *
+*                                    |                                           *
+*                           +----------------+                                   *
+*             +------------>|    Caduceus    |<--------------+                   *
+*             |             +----------------+               |                   *
+*             |                      ^                       |                   *
+*             |                      |                       |                   *
+*             |                      |                       |                   *
+*             |                      |                       |                   *
+*             |w_{parsagent} = 0.35  | w_{atlas3} = 0.4      | w_{kawaii} = 0.25 *
+*+------------+----------------------+-----------------------+-----------+       *
+*|  +------------------+   +------------------+    +------------------+  |       *
+*|  |    ParsAgent     |   |      Atlas3      |    |      Kawaii      |  |       *
+*|  +------------------+   +------------------+    +------------------+  |       *
+*|     b_{parsagent}            b_{atlas3}             b_{kawaii}        |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |    Issue|HP      |   |    Issue|Dell    |    |    Issue|HP      |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |    Brand|256GB   |   |    Brand|512GB   |    |    Brand|1TB     |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |HardDrive|13"     |   |HardDrive|17"     |    |HardDrive|17"     |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|                                                                       |       *
+*|                                Experts                                |       *
+*+-----------------------------------------------------------------------+       *
+**********************************************************************************
+[Figure [fig1]: CO version of Caduceus combines experts opinions]
+
+
+!!! note
+    The modification that you are going to do to IPO is changing how the bid is generated. In _CO_ version pick the values of the issues that are offered the most by the experts.
+
+# Bonus Task: Further improvements
+
+* Instead of each agent has same impact on the votes, how about using weights to vote?
+* Try to come up with an heuristic to find weights of each expert.
+
+
+# Bibliography
+[#Gunes2017]: Güneş T. D., Arditi E., and Aydoğan R., “Collective Voice of Experts in Multilateral Negotiation,” in PRIMA 2017: Principles and Practice of Multi-Agent Systems: 20th International Conference, Nice, France, October 30 – November 3, 2017, Proceedings, B. An, A. Bazzan, J. Leite, S. Villata, and L. van der Torre, Eds. Cham: Springer International Publishing, 2017, pp. 450–458.  https://link.springer.com/chapter/10.1007/978-3-319-69131-2_27
+
+<!-- Markdeep: -->
+<script>window.markdeepOptions = {"tocStyle": "medium"};
+</script>
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+
