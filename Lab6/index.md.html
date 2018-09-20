@@ -1,0 +1,131 @@
+              <meta charset="utf-8" emacsmode="-*- markdown -*-">
+
+                            **COMP6203: Lab #6**
+                        	Intelligent Agents
+                        _Monday, 1 October 2018_
+                        University of Southampton
+
+This lab shows some key components of a negotiation agent and how to start improving them.
+
+# Theory Crash Course
+
+
+We separate our negotiating agent's grand strategy into smaller strategies:
+
+* **Offering Strategy** (i.e. _Bidding Strategy_): the strategy of what bids to generate
+
+* **Opponent Modelling**: how to best capture/predict the preferences of our opponents
+
+* **Acceptance Strategy**: our strategy of deciding when to accept, when to counter-offer, when to walk away.
+
+* **Opponent Model Strategy**: how to use opponent modelling to select a bid for opponent
+
+There are many papers in the literature focuses on a specific part of the design of an negotiating agent. We recommend you to check the bibliography to existing negotiation strategies.
+
+!!! note
+    GENIUS has a framework called `BOA` to allow mixing different components without implementing your agent from scratch. You can have a look to experiment with strategies.
+
+!!! warning
+    Early version GENIUS initially allowed bilateral negotiations. Therefore, some components of BOA is focused on only bilateral negotiations. Double check their source code to make sure.
+
+![Figure [boa]: BOA Framework](boa.png width="600px")
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+opponentModel.init(negotiationSession, omParams);
+omStrategy.init(negotiationSession, opponentModel, omsParams);
+offeringStrategy.init(negotiationSession, opponentModel, omStrategy,
+        osParams);
+acceptConditions.init(negotiationSession, offeringStrategy,
+        opponentModel, acParams);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[Figure [boaparty]: [BoaParty](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/boaframework/BoaParty.java), the relationships between strategies `negotiationSession` holds values such as: BidHistory, Domain, OutcomeSpace]
+
+## A simple BOA Party:
+
+We can make our simple agent by combining already available strategies from GENIUS. Assume that these are picked:
+
+### Offering Strategy: [ChoosingAllBids](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/negotiator/boaframework/offeringstrategy/other/ChoosingAllBids.java)
+
+_"An offering strategy which creates a list of possible bids and then offers them in descending order. If all bids are offered, then the last bid is repeated."_
+
+### Opponent Modelling: [UniformModel](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/negotiator/boaframework/opponentmodel/UniformModel.java)
+
+_"Simple baseline opponent model which always returns the same preference."_
+
+### Acceptance Strategy: [AC_Const](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/negotiator/boaframework/acceptanceconditions/other/AC_Const.java)
+
+_"This Acceptance Condition accepts an opponent bid if the utility is above a constant."_
+
+### Opponent Model Strategy: [BestBid](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/negotiator/boaframework/omstrategy/BestBid.java)
+
+_"This class uses an opponent model to determine the next bid for the opponent, while taking the opponent's preferences into account. The opponent model is used to select the best bid."_
+
+
+!!! note:
+    Exercise: try to define the behaviour of our BOA agent that uses all these component above. 
+
+# Task 1: Create this BOA Agent from GENIUS User Interface
+
+1. Go to the `BOA Parties` tab in GENIUS. 
+2. Right click and click `add new item`. 
+3. Observe all available components.
+4. Pick the ones we mentioned above.
+5. After creating the agent, have a couple of runs to make sure it works.
+
+# Task 2: Define this BOA Agent programmatically
+
+You need to use `BOAParty` class to extend your new agent.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+import genius.core.boaframework.BoaParty;
+import genius.core.boaframework.SessionData;
+import genius.core.parties.NegotiationInfo;
+import genius.core.persistent.PersistentDataType;
+import negotiator.boaframework.omstrategy.NullStrategy;
+
+import java.util.HashMap;
+
+public class SimpleBoaParty extends BoaParty {
+    public SimpleBoaParty () {
+        super (null , new HashMap <String , Double >() , null ,
+                new HashMap<String , Double >() , null ,
+                new HashMap <String , Double >() , null ,
+                new HashMap <String , Double >());
+    }
+    @Override
+    public void init ( NegotiationInfo info ) {
+        SessionData sessionData = null ;
+        if ( info . getPersistentData ()
+                . getPersistentDataType () == PersistentDataType. SERIALIZABLE ) {
+            sessionData = ( SessionData ) info . getPersistentData (). get ();
+        }
+        if ( sessionData == null ) {
+            sessionData = new SessionData ();
+        }
+        negotiationSession = new NegotiationSession( sessionData ,
+                info . getUtilitySpace (), info . getTimeline ());
+        opponentModel = new MyrequencyModel ();
+        opponentModel . init ( negotiationSession , new HashMap <String , Double >());
+        omStrategy = new NullStrategy( negotiationSession );
+        offeringStrategy = new MyBiddingStrategy ( negotiationSession ,
+                opponentModel , omStrategy );
+        acceptConditions = new AC_Next ( negotiationSession , offeringStrategy , 1,
+                0);
+    // we have init 'd all params here , don 't call super init
+    }
+    @Override
+    public String getDescription () {
+        return " Simple BOA Party ";
+    }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Task 3: Change _Opponent Modelling_ approach with frequency based approach
+
+As you noticed from the implementation of the `UniformModel`, it returns equally evaluations of each bid. Instead of this dummy component, write a frequency based approach that looks at the bid history and makes better predictions about opponents preference profile. 
+
+<!-- Markdeep: -->
+<script>window.markdeepOptions = {"tocStyle": "medium"};
+</script>
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+

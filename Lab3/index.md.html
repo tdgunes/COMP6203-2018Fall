@@ -168,7 +168,44 @@ where $U(b_a)$ is the utility of the bid without the influence of the discount f
 ## Subtask 1: Half Best & Half Random
 Try to write an agent that gives best offer for itself for half of the time during the negotiation, the agent should give random offers.
 
-Use the snippet from [here](https://gist.githubusercontent.com/tdgunes/e198bbe40d912ff71797b1fde2c3c15b/raw/89027dfabc74fd99882cd985a78dd91c473e10ad/gistfile1.txt) as a starting point.
+Use the snippet from below as a starting point.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+import java.util.List;
+
+import genius.core.AgentID;
+import genius.core.Bid;
+import genius.core.actions.Accept;
+import genius.core.actions.Action;
+import genius.core.actions.Offer;
+import genius.core.parties.AbstractNegotiationParty;
+import genius.core.parties.NegotiationInfo;
+
+public class YourAgentsName extends AbstractNegotiationParty {
+    private final String description = "YourAgentsName";
+
+    @Override
+    public void init(NegotiationInfo info) {
+        super.init(info);
+
+    }
+
+    @Override
+    public Action chooseAction(List< Class< ? extends Action > > list) {
+        
+    }
+
+    @Override
+    public void receiveMessage(AgentID sender, Action act) {
+        super.receiveMessage(sender, act);
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Getting the best bid: 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
@@ -194,7 +231,7 @@ Accessing normalized time $t \in [0, 1]$:
 double time = this.getTimeLine().getTime();
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## Subtask 2: Count the counter-offers and accept messages
+## Bonus Subtask: Count the counter-offers and accept messages
 
 Try to count the acceptance and counter-offers from which agents. You may think about storing them in a `Map`. 
 
