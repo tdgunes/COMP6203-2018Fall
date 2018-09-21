@@ -5,7 +5,7 @@
                         _Monday, 1 October 2018_
                         University of Southampton
 
-This lab shows how a previous winner ([ANAC2016](http://web.tuat.ac.jp/~katfuji/ANAC2016/)) of the international automated negotiation competition.
+This lab shows how to implement a previous winner ([ANAC2016](http://web.tuat.ac.jp/~katfuji/ANAC2016/)) of the international automated negotiation competition.
 
 # Theory Crash Course
 
@@ -28,7 +28,7 @@ This type of combined approaches exist in:
     * Genetic Algorithms (_slightly similar_)
     * Mixture of Experts
 
-## Caduceus IPO
+## Caduceus IPO - _Incremental Portfolio Approach_
 
 Essentially, Caduceus has _a set of experts $A$._ 
 
@@ -64,7 +64,7 @@ where:
     * i.e. the number of experts that recommend making a counter offer
 * $a^{'}_i$: action that agent i recommends to Caduceus to take
 
-# Task 1: Implement IPO version of Caduceus
+# Task 1: Implement Caduceus IPO - _Incremental Portfolio_
 
 
 !!! warning
@@ -72,11 +72,11 @@ where:
 
 !!! warning
     You can pick your experts from previous competitions. But be careful, if you are going to use agents from:
-        * From ANAC 2016: agents protocol became SOAP
+        * From ANAC 2016: agents protocol was set to be SOAP.
         * From ANAC 2017: agents can access data from their past negotiations form a tournament. Check the details [here](http://web.tuat.ac.jp/~katfuji/ANAC2017/).
         * From ANAC 2019 (upcoming): agents which can work with partially ordered preference profiles will be used, protocol is expected to be bilateral version of SOAP.
 
-# Task 2: Implement CO version of Caduceus
+# Task 2: Implement Caduceus CO - _Crossover_
 
 Implement _Crossover Strategy_ of Caduceus: Algorithm 1.2 without _waiting phase_ from the paper. 
 

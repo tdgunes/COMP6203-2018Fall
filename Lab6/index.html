@@ -87,10 +87,10 @@ import java.util.HashMap;
 
 public class SimpleBoaParty extends BoaParty {
     public SimpleBoaParty () {
-        super (null , new HashMap <String , Double >() , null ,
-                new HashMap<String , Double >() , null ,
-                new HashMap <String , Double >() , null ,
-                new HashMap <String , Double >());
+        super (null , new HashMap < String , Double > () , null ,
+                new HashMap < String , Double > () , null ,
+                new HashMap < String , Double > () , null ,
+                new HashMap < String , Double > ());
     }
     @Override
     public void init ( NegotiationInfo info ) {
@@ -105,7 +105,7 @@ public class SimpleBoaParty extends BoaParty {
         negotiationSession = new NegotiationSession( sessionData ,
                 info . getUtilitySpace (), info . getTimeline ());
         opponentModel = new MyrequencyModel ();
-        opponentModel . init ( negotiationSession , new HashMap <String , Double >());
+        opponentModel . init ( negotiationSession , new HashMap < String , Double > ());
         omStrategy = new NullStrategy( negotiationSession );
         offeringStrategy = new MyBiddingStrategy ( negotiationSession ,
                 opponentModel , omStrategy );
