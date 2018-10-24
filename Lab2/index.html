@@ -44,19 +44,20 @@ A `domain` $D$ specification determines what type of offers that can be made by 
 A domain contains $n$ issues: 
 
 \begin{equation}
-D = (I_1, ..., I_n)
+D = \{I^{1}, ..., I^{n}\}
 \end{equation}
 
 Each issue $i$ consists of $k$ values:
 
 \begin{equation}
-I_i = (v^{i}_1, ..., v^{i}_k)
+
+\forall I^{i} \in D\quad I^{i} = \{v_{1}^{i}, v_{2}^{i}, ..., v_{k}^{i} \}_{k = |I^{i}| }
 \end{equation}
 
 An offer from an agent $a$ that can be formulated as choices $c$:
 
 \begin{equation}
-b_{a} = (v^{i}_{c_i}, ... v^{n}_{c_n})
+b_{a} = \{ v^{i}_{j} |\ v^{i}_{j} \in I^{i}, 1 \leq i \leq n \}
 \end{equation}
 
 
@@ -98,8 +99,12 @@ We say each agent has a _preference profile_ that represents these preferences. 
 Formally the utility of a bid is calculated as:
 
 \begin{equation}
-U(b_a) = \sum_{i=1}^{n} \omega_i \frac{eval(v^{i}_{c_i})}{max(eval(I_i))}
+U(b_a) = \sum_{i=1}^{n} \omega_i \frac{eval(v^{i}_{j})}{max(eval(I_i))}
 \end{equation}
+
+!!! warning Sum of all weights is $1.0$.
+    Formally it is: $\sum_{i=1}^{n} \omega_i = 1.0$
+    
 
 Let's again assume, our agent is working in `Laptop` domain (as defined in Equation $\ref{domainlaptop}$).
 
@@ -130,9 +135,9 @@ Let's again assume, our agent is working in `Laptop` domain (as defined in Equat
 *    |                                         |     |   |                    |   |  *
 *    |           +-----------------+           |     |   |$w_{Monitor}$ = 0.8 |   |  *
 *    |           |     Monitor     |<----------+-----+---|                    |   |  *
-*    |           +--------+--------+           |     |   |  eval(13") = 0.10  |   |  *
-*    |                    |                    |     |   |  eval(15") = 0.25  |   |  *
-*    |      +-------------+-------------+      |     |   |  eval(17") = 0.65  |   |  *
+*    |           +--------+--------+           |     |   |  eval(13) = 10     |   |  *
+*    |                    |                    |     |   |  eval(15) = 25     |   |  *
+*    |      +-------------+-------------+      |     |   |  eval(17) = 65     |   |  *
 *    |      v             v             v      |     |   +--------------------+   |  *
 *    | +---------+   +---------+   +---------+ |     +----------------------------+  *
 *    | |   13"   |   |   15"   |   |   17"   | |      Agent B's AdditiveUtilitySpace *
@@ -143,7 +148,7 @@ Let's again assume, our agent is working in `Laptop` domain (as defined in Equat
 [Figure [agentbpref]: Preference Profile of Agent $b$ (instantiated with _AdditiveUtilitySpace_)]
 
 !!! note
-    **Practice[^answer1]**: Calculate the utility of $b_{a} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{13}^{"})$ for Agent $b$. 
+    **Practice[^answer1]**: Calculate the utility of $b_{a} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{13}^{"})$ for Agent b. 
 
 ### Partially Ordered Space
 
@@ -177,7 +182,7 @@ randomly\_sample(B_a^{ordered}, 4) = (b_a^{21},b_a^{10},b_a^{4}, b^{5})
 With negotiation sessions that have partially ordered space as uncertainty, the agent needs to reason and predict about the other unknown parts of the space. Also, since the utility of each bid is unknown too, the negotiating agent may need to predict the utilities of the other bids from observing the order.
 
 !!! note
-  Genius 9.1.2 includes `UncertaintyAgentExample.java`, which demonstrates the API to access this preference profile.
+    Genius 9.1.2 includes`UncertaintyAgentExample.java`, which demonstrates the API to access this preference profile.
 
 [^oprof]: Genius User Guide also mentions: `ConstraintUtilitySpace` and `NonlinearUtilitySpace`.
 
@@ -199,12 +204,21 @@ After saving the domain with issues create a preference profile for Agent B and 
 
 ![Figure [step2]: Right click to domain's name](pic2.png width="500px")
 
+### Creating an uncertain preference profiles
+
+You can set the preference profile as uncertain and set _comparisons_ metrics:
+
+![Figure [step3]: Setting uncertain preference profile](pic3.png width="600px")
+
+!!! note
+    **Practice:** Why do you think that _maximum number of rankings_ (as shown in purple box in Figure [step3]) is set to 27?
+
 ## Double check the created XML
 
 When you create the preference profiles and the domain, have a look at the created XML files. They are by default located at:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~sh
-{PROJECT_WORKING_DIRECTORY}/genius/templates/lab2_laptop
+{PROJECT_WORKING_DIRECTORY}/genius{version}/etc/templates/lab2_laptop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Check whether `lab2_laptop_util1.xml` is similar as below:
@@ -246,7 +260,7 @@ Copy paste the code snippet below `init(NegotiationInfo info)` method of your ag
 AbstractUtilitySpace utilitySpace = info.getUtilitySpace();
 AdditiveUtilitySpace additiveUtilitySpace = (AdditiveUtilitySpace) utilitySpace;
 
-List<Issue> issues = additiveUtilitySpace.getDomain().getIssues();
+List< Issue > issues = additiveUtilitySpace.getDomain().getIssues();
 
 for (Issue issue : issues) {
     int issueNumber = issue.getNumber();
@@ -293,7 +307,7 @@ for (Issue issue : issuesList) {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-[^answer1]: _ϛ6˙0 sᴉ ɹǝʍsuɐ ǝɥʇ_ 
+[^answer1]: _~0.27 sᴉ ɹǝʍsuɐ ǝɥʇ_ 
 
 <!-- Markdeep: -->
 <script>window.markdeepOptions = {"tocStyle": "medium"};</script>

@@ -32,19 +32,19 @@ To approach this _negotiation problem_, to be a good negotiator, you may conside
 
 ## Short Introduction
 
-To approach this problem from a computer science perspective, in the field of *Automated Negotiation*, this problem is modelled in various ways. To give a brief introduction to these models, assume that there are: 
+To approach this problem from a computer science perspective, in the field of *Automated Negotiation*, this problem is modelled in various ways. To give a brief introduction to these models, assume that there are:
 
-* **A set of agents** is the participants of negotiation.
+* **A set of agents**: the participants of negotiation.
 	* e.g. _negotiating parties_, _humans_ or _software agents_
-* **A domain** is the context the agents are negotiating in.
-	* e.g. _example above: organizing parties_, negotiating a business deal_, _smart grids, negotiating the electric prices_
-* **An issue** is a troubling point that requires negotiation.
+* **A domain**: the context the agents are negotiating in.
+	* e.g. _example above: organizing parties_, _negotiating a business deal_, _smart grids, negotiating the electric prices_
+* **An issue**: a troubling point that requires negotiation.
     * e.g. if domain is organizing party: what food to buy 
-* **Preference profiles** a set of profiles, that captures individuals preferences
-    * e.g. If the domain is _party_, assume that Agent A prefers *Pizza* over *Hamburger* for **Food**. Agent B prefers *Hamburger* over *Pizza*.  
-* **A deadline** when the negotiation halts. 
+* **Preference profiles**: a set of profiles, that captures individuals preferences.
+    * e.g. If the domain is _party_, assume that Agent A prefers *Pizza* over *Hamburger* for the **Food** issue. Agent B prefers *Hamburger* over *Pizza*.  
+* **A deadline**: when the negotiation halts. 
 	* e.g. 1 hour, 2000 rounds (will be explained later)
-* **A protocol** how the negotiation is going to take place.
+* **A protocol**: how the negotiation is going to take place.
 	* e.g. [Round-robin](https://en.wikipedia.org/wiki/Round-robin_tournament) fashion, a mediator based
 
 ******************************************************************************
@@ -106,11 +106,11 @@ Throughout this module, you are expected to implement _a negotiating agent_. You
 ## Prerequisites 
 
 !!! warning
-    Make sure that you have downloaded and installed the exact versions of prerequisites. Newer Java versions known to have some issues with GENIUS 9.1.1. 
+    Make sure that you have downloaded and installed the exact versions of prerequisites. Newer Java versions known to have some issues with GENIUS 9.1.2. 
 
 ### Software Prerequisites 
 * [`Java Development Kit 8`](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-* [`GENIUS 9.1.1`](http://ii.tudelft.nl/genius/sites/default/files/genius-9.1.2.zip)
+* [`GENIUS 9.1.2`](http://ii.tudelft.nl/genius/sites/default/files/genius-9.1.2.zip)
 
 ### Resources
 * [`Java Cheatsheet`](https://introcs.cs.princeton.edu/java/11cheatsheet/) _Remember/learn the basics of Java programming language._
@@ -119,10 +119,16 @@ Throughout this module, you are expected to implement _a negotiating agent_. You
 
 ## Installation 
 
-There are three different options to follow to set up the simulation environment. If you want to set the environment from scratch follow `Option 1`. We recommend `Intellij` Java IDE for implementation. If you are more experienced with Eclipse, you can follow `Option 3`.
+There are three different options to follow to set up the simulation environment. If you want to set the environment from scratch follow `Option 1`. We recommend `Intellij` Java IDE for implementation. But you can also use `Eclipse` or `Netbeans`, if you are more experienced with those.
 
 ### Option 1
 You can watch the video below which explains how to set it up from scratch with using Intellij. 
+
+!!! warning Things to look out during the video!
+    Since the version of the GENIUS is changed, there might be some steps that are slightly different. 
+
+    *   `Scenario` from the GUI is removed.
+    *   Use only `Tournament` (for multiple sessions) and `Negotiation` (for a single session) options in the GUI.
 
 ![Figure [video]: How to set up Genius from scratch](https://www.youtube.com/watch?v=ES_bpdRiSNM)
 
@@ -148,11 +154,6 @@ git clone https://github.com/tdgunes/ExampleAgent.git
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 and import the ExampleAgent folder as a project to Intellij (other major Java IDEs also should work). 
-
-
-### Option 3
-
-You can follow the steps from the [official manual](https://tracinsy.ewi.tudelft.nl/pub/svn/Genius/doc/userguide.pdf), in Section 12.
 
 
 # Task 2: Run GENIUS with ExampleAgent
