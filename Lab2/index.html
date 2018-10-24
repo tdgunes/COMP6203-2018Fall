@@ -79,7 +79,7 @@ b_{a} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{M
 
 ## Preference Profiles, Utility Spaces
 
-Following the example the bid, let's assume that there are only two agents: Agent $a$ and Agent $b$ negotiating about *which laptop to buy*.
+Following the example of the bid, let's assume that there are only two agents: Agent $a$ and Agent $b$ negotiating about *which laptop to buy*.
 
 1. Agent $a$ makes an offer: $b_{a} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{13}^{"})$
 2. When Agent $b$ observes the offer, the question is: how preferable is the bid $b_{a}$ for Agent $b$?
@@ -92,7 +92,7 @@ Each agent has their own preferences for each issue. In this example, for instan
 We say each agent has a _preference profile_ that represents these preferences. Each participant agent has their own profile. There are many types of different profiles[^oprof], the two we are going to focus are:
 
 * **Additive Utility Space**: The space is additive, when a bid is evaluated, this space can generate a total utility. 
-* **Partially Ordered Space[^pop]**: Instead of assigning utility value to bid, this space stores a partial order of values. By partial ordering, the available information about the preferences of an agent is that for some bid $X$ is preferred over bid $Y$ for a subset of the possible bids.
+* **Partially Ordered Space[^pop]**: Instead of assigning utility value to bids, this space stores a partial order of values. By partial ordering, the available information about the preferences of an agent is that for some bid $X$ is preferred over bid $Y$ for a subset of the possible bids.
 
 ### Additive Utility Space
 
@@ -179,12 +179,12 @@ The list may include bids with same utilities consecutively. Whenever parameter 
 randomly\_sample(B_a^{ordered}, 4) = (b_a^{21},b_a^{10},b_a^{4}, b^{5})
 \end{equation}
 
-With negotiation sessions that has partially ordered space as uncertainty, the agent needs to reason and predict about the other unknown parts of the space. Also, since the utilities of each bid are unknown too, from by observing the order the negotiating agent may need to predict the utilities of the other bids too.
+With negotiation sessions that have partially ordered space as uncertainty, the agent needs to reason and predict about the other unknown parts of the space. Also, since the utility of each bid is unknown too, the negotiating agent may need to predict the utilities of the other bids from observing the order.
 
 !!! note
     Genius 9.1.2 includes`UncertaintyAgentExample.java`, which demonstrates the API to access this preference profile.
 
-[^oprof]: Genius User Guide mentions: `ConstraintUtilitySpace` and `NonlinearUtilitySpace`.
+[^oprof]: Genius User Guide also mentions: `ConstraintUtilitySpace` and `NonlinearUtilitySpace`.
 
 [^pop]: It is expected that [ANAC 2019](http://web.tuat.ac.jp/~katfuji/ANAC2018/) (Automated Negotiation Competition) is going to include partially ordered preference profiles. 
 
