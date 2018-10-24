@@ -10,7 +10,7 @@ This lab introduces the concepts: bids, issues, preference profiles and utility 
 
 # Theory Crash Course
 
-This section provides the essential theory to understand the negotiation process. In the next section, API definitions will be provided.  
+This section provides the essential theory to understand a negotiation process in GENIUS platform. In the next section, API definitions will be provided.  
 
 ## Domain: Bids, Issues, Values
 
@@ -67,7 +67,7 @@ b_{a} = \{ v^{i}_{j} |\ v^{i}_{j} \in I^{i}, 1 \leq i \leq n \}
 D_{laptop} = (Brand, HardDisk, Monitor) \\ 
 I_{Brand} = (Dell, Apple, HP) \\ 
 I_{HardDisk} = (256GB, 512GB, 1TB) \\ 
-I_{Monitor} = (13^{"}, 15^{"}, 17^{"}) \\ 
+I_{Monitor} = (13, 15, 17) \\ 
 \label{domainlaptop}
 \end{equation}
 
@@ -140,7 +140,7 @@ Let's again assume, our agent is working in `Laptop` domain (as defined in Equat
 *    |      +-------------+-------------+      |     |   |  eval(17) = 65     |   |  *
 *    |      v             v             v      |     |   +--------------------+   |  *
 *    | +---------+   +---------+   +---------+ |     +----------------------------+  *
-*    | |   13"   |   |   15"   |   |   17"   | |      Agent B's AdditiveUtilitySpace *
+*    | |   13    |   |   15    |   |   17    | |      Agent B's AdditiveUtilitySpace *
 *    | +---------+   +---------+   +---------+ |                                     *
 *    +-----------------------------------------+                                     *
 *                 Domain: Laptop                                                     *
@@ -170,16 +170,16 @@ B_a^{ordered} = (b_a^{1},b_a^{2},b_a^{3}, ..., b_a^{27})
 B_a is sorted by the utility of the each bid starts, from lowest to highest, can be such as:
 
 \begin{equation}
-b_a^{1} < b_a^{2} < b_a^{3} \leq ... \leq b_a^{27}
+b_a^{1} < b_a^{6} < b_a^{7} \leq ... \leq b_a^{21}
 \end{equation}
 
 The list may include bids with same utilities consecutively. Whenever parameter **comparisons** is set to some value, assume that it is $4$. Four bids will be randomly sampled from $B_a$. Then, the agent can only observe, for instance:
 
 \begin{equation}
-randomly\_sample(B_a^{ordered}, 4) = (b_a^{21},b_a^{10},b_a^{4}, b^{5})
+randomly\_sample(B_a^{ordered}, 4) = (b_a^{21},b_a^{10},b_a^{4}, b^{5}_a)
 \end{equation}
 
-With negotiation sessions that have partially ordered space as uncertainty, the agent needs to reason and predict about the other unknown parts of the space. Also, since the utility of each bid is unknown too, the negotiating agent may need to predict the utilities of the other bids from observing the order.
+With negotiation sessions that have partially ordered space preference profiels, the negotiating agent needs to reason and predict about the other unknown parts of the space. Also, since the utility of each bid is unknown too, the negotiating agent may need to predict the utilities of the other bids the order alone.
 
 !!! note
     Genius 9.1.2 includes`UncertaintyAgentExample.java`, which demonstrates the API to access this preference profile.
@@ -191,7 +191,9 @@ With negotiation sessions that have partially ordered space as uncertainty, the 
 
 # Task 1: The laptop domain and preferences in GENIUS
 
-You are expected to create the same domain as shown in Figure [agentbpref] in GENIUS.
+ At this point, if you are expected to be familiar with the theoritical concepts. To not get confused with the implementation, make sure that you understand the topics above. 
+
+ * For this task, create the same domain as shown in Figure [agentbpref] in GENIUS.
 
 !!! WARNING
     There is already a laptop domain included in GENIUS. Use **lab2_laptop** as the name for the new domain.
@@ -220,6 +222,12 @@ When you create the preference profiles and the domain, have a look at the creat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~sh
 {PROJECT_WORKING_DIRECTORY}/genius{version}/etc/templates/lab2_laptop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+!!! warning If you are having trouble finding this file:
+    Set your working directory where the genius.jar is located. Some links for you, if you are confused:
+    * [What is a working directory in IDE?](https://en.wikipedia.org/wiki/Working_directory)
+    * [How to change the working directory of Intellij run/debug configurations?](https://youtu.be/ES_bpdRiSNM?t=220) 
+
 
 Check whether `lab2_laptop_util1.xml` is similar as below:
 
@@ -253,8 +261,42 @@ Check whether `lab2_laptop_util1.xml` is similar as below:
 
 # Task 2: Accessing the preference profile via API
 
+In this task, you are going to programmatically access the preference profiles. First, you are going to make your agent access to an AdditiveUtilitySpace preference profile that you created earlier.
+
 ## Subtask 1: AdditiveUtilitySpace Exercise
-Copy paste the code snippet below `init(NegotiationInfo info)` method of your agent: 
+
+Before doing this exercise, it is very important to read below.
+
+!!! warning Make sure that **uncertainty** option of the preference profiles in `lab2_laptop` is disabled. 
+    Otherwise, you might get `NullPointerException` from GENIUS platform.
+
+!!! warning Do not forget to **compile** your agent after making any changes.
+    Otherwise, your agent will not output the preference profile.
+
+!!! warning If you see a tiny window when you run GENIUS:
+    Have a look at [this solution](https://superuser.com/a/1207925).
+
+!!! error Make sure that your development environment is ready at this point.
+    A brief checklist:
+    * Make sure you have these files:
+        * **ProjectName/**
+            * **genius{version}/**
+                * **etc/**
+                * **log/**
+                * **some other genius files**
+                * genius{version}.jar
+            * **out/**
+                * NameOfYourAgent.class
+            * **src/**
+                * NameOfYourAgent.java
+    * Make sure that your project has these following settings (to change these `File`->`Project Structure`->`Project Settings`):
+        * Project language level is set to **8**.
+        * Project SDK is set to **Java 1.8**.
+        * `genius{version}.jar` is included in Libraries tab.
+    * Make sure that working directory of run configuration of `genius{version}.jar` is set to `../genius{version}/` folder. 
+        * You can again have a look [at the video]((https://youtu.be/ES_bpdRiSNM?t=220) from the previous lab.
+
+ * Copy paste the code snippet **inside** `init(NegotiationInfo info)` method of your agent (**after super.init(info)**): 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
 AbstractUtilitySpace utilitySpace = info.getUtilitySpace();
@@ -282,29 +324,38 @@ for (Issue issue : issues) {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-!!! note
-    Run a single negotiation session and validate if your agent can access the preference profile or not.
+* Run a single negotiation session and validate if your agent can access the preference profile or not.
+
+!!! note Try to understand what each line is doing. Add comments to the code above.
+    Have a look at the [GENIUS javadoc](https://tdgunes.com/genius-9.1.1-javadoc/index.html).
+
 
 ## Subtask 2: Partially Ordered Space Exercise
 
 This time, in this space only the preference order of some bids are observed. To access the ranking list of these bids, we use [`userModel field`](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/uncertainty/UserModel.html) of [`AbstractNegotiationParty class`](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/parties/AbstractNegotiationParty.html):
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
-List<Bid> bids = userModel.getBidRanking().getBidOrder();
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+!!! warning Make sure that **uncertainty** option of the preference profiles in `lab2_laptop` is now enabled. 
+    Otherwise, you might get `NullPointerException` from GENIUS platform.
 
-!!! note
-    Run a single negotiation session with partially ordered spaces for laptop domain and check if you can access them. 
+!!! warning Make sure that you remove/comment the code that you inserted from the previous task.
+    Otherwise, you are going to get some errors, because the API to access the partially ordered space is different in GENIUS.
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+List< Bid > bids = userModel.getBidRanking().getBidOrder();
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Also try to access the properties of a bid, using [`Bid class`](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/Bid.html):
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
-List<Issue> issuesList = bid.getIssues();
+List< Issue > issuesList = bid.getIssues();
 
 for (Issue issue : issuesList) {
     System.out.println(issue.getName() + ": " + bid.getValue(issue.getNumber()));
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 
+* Run a single negotiation session with partially ordered spaces for laptop domain that you created earlier and check if you can access them by using the code snippets from this section.
 
 
 [^answer1]: _~0.27 sᴉ ɹǝʍsuɐ ǝɥʇ_ 
