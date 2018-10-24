@@ -260,7 +260,7 @@ Copy paste the code snippet below `init(NegotiationInfo info)` method of your ag
 AbstractUtilitySpace utilitySpace = info.getUtilitySpace();
 AdditiveUtilitySpace additiveUtilitySpace = (AdditiveUtilitySpace) utilitySpace;
 
-List<Issue> issues = additiveUtilitySpace.getDomain().getIssues();
+List< Issue > issues = additiveUtilitySpace.getDomain().getIssues();
 
 for (Issue issue : issues) {
     int issueNumber = issue.getNumber();
