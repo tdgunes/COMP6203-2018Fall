@@ -100,7 +100,7 @@ Before bidding phase starts again, if a bid gets accept votes from all parties, 
 
 ### [Alternating Majority Consensus Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/AlternatingMajorityConsensusProtocol.html)
 
-This protocol is essentialy same as _Alternating Multiple Offers Protocol_, the main difference is that the protocol keeps track of **the acceptance of offers**. At the end of an negotiation, the most favorable but not accepted by everybody offer is accepted by all parties. If any offer is accepted before the deadline by everybody, the negotiation ends.
+This protocol is essentialy same as _Alternating Multiple Offers Protocol_, the main difference is that the protocol keeps track of **the acceptance of offers**. If the negotiation ends without any acceptance of an offer, , the offer that got most accepts is used for agreement. As in previous protocol when an offer is accepted before the deadline by everybody, the negotiation ends.
 
 !!! note:
     **For example**, assume that negotiation ends because of the deadline and $(Dell, 256GB, 13")$ is offered and accepted by the majority then other offers, then everybody accepts this offer, because of the protocol.
