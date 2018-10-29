@@ -14,11 +14,11 @@ This section provides the essential theory to understand how agents communicate 
 * **Bilateral**: Only two agents are participating in the negotiation session.
 * **Multilateral**:  Usually refers to more than two agents participating in the negotiation session.
 
-The examples we give on the protocols that defined below are going to be in multilateral settings. However, bilateral settings are also possible with these protocols.
+The examples we give on the protocols defined below are going to be in multilateral settings. However, bilateral settings are also possible with these protocols.
 
 ## Protocols without a Mediator
 
-The protocols that are mentioned in this section, does not have a third-party agent that handles communication between negotiatiors.
+The protocols that are mentioned in this section, do not have a third-party agent that handles communication between negotiatiors.
 
 ### **[SAOP: Stacked Alternating Offers Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/StackedAlternatingOffersProtocol.html)**
 
@@ -67,7 +67,7 @@ The second party can *accept this offer*, *make a counter offer* or *walk away*.
 [Figure [firstrounds2]: _Agent B_ makes a counter offer]
 
 
-Assume that Agent A and Agent B accept the offer on the negotiation table. Since they all agree on this offer, the negotiation ends with this offer.
+Assume that Agent C and Agent A accept the offer on the negotiation table. Since they all agree on this offer, the negotiation ends with this offer.
 
 ************************************************
 *Agent A                               Agent B *
@@ -81,7 +81,7 @@ Assume that Agent A and Agent B accept the offer on the negotiation table. Since
 *                            │                 *
 *                   Agent C ─┘                 *
 ************************************************
-[Figure [firstrounds3]: _Agent A_ and _Agent B_ accepts _Agent B_'s offer.]
+[Figure [firstrounds3]: _Agent C_ and _Agent A_ accept _Agent B_'s offer.]
 
 
 This protocol is used in the international negotiation competition multiple times. For more about this, check [GENIUS's User Guide Section 2.1](https://tracinsy.ewi.tudelft.nl/pub/svn/Genius/doc/userguide.pdf), [ExampleAgent Wiki](https://github.com/tdgunes/ExampleAgent/wiki/Stacked-Alternating-Offers-Protocol) and [a question from previous year](https://github.com/tdgunes/ExampleAgent/issues/6).
@@ -100,10 +100,10 @@ Before bidding phase starts again, if a bid gets accept votes from all parties, 
 
 ### [Alternating Majority Consensus Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/AlternatingMajorityConsensusProtocol.html)
 
-This protocol is essentialy same as _Alternating Multiple Offers Protocol_, the main difference is that the protocol keeps track of **the acceptance of offers**. If the negotiation ends without any acceptance of an offer, , the offer that got most accepts is used for agreement. As in previous protocol when an offer is accepted before the deadline by everybody, the negotiation ends.
+This protocol is essentialy same as _Alternating Multiple Offers Protocol_, the main difference is that the protocol keeps track of **the acceptance of offers**. If the negotiation ends without any acceptance of an offer, the offer that got most accepts is used for agreement. As in previous protocol when an offer is accepted before the deadline by everybody, the negotiation ends.
 
 !!! note:
-    **For example**, assume that negotiation ends because of the deadline and $(Dell, 256GB, 13")$ is offered and accepted by the majority then other offers, then everybody accepts this offer, because of the protocol.
+    **For example**, assume that negotiation ends because of the deadline and $(Dell, 256GB, 13")$ is offered and accepted by a bigger majority than other offers, then everybody has to take this offer because of the protocol.
 
 ## Protocols with a Mediator:
 
@@ -132,21 +132,21 @@ The mediator generates a different bid in each round as same as before, trying t
 
 # Other Factors
 
-Negotiation sessions are parametrized with two additional parameters: _time pressure_, _discount factor_ and _reservation value_. These influence the agents performance throughout the negotiation.
+Negotiation sessions are parametrized with two additional parameters: _time pressure_ (_discount factor_) and _reservation value_. These influence the agents performance throughout the negotiation.
 
 ## Reservation Value
 
-`Reservation Value` is the utility of _walking away_. In other words, it is a real-valued threshold that a rational negotiating agent should not accept any offers below that threshold.
+`Reservation Value` is the utility of _walking away_. In other words, it is a real-valued threshold below which a rational negotiating agent should not accept any offers.
 
 !!! note
-    Each agent may have a different reservation value.
+    Each agent may have a different reservation value. They are defined within a preference profile.
 
 ## Time Pressure
 
 Each negotiation session has a predefined deadline, it can be in real time as _seconds_ or _rounds_. The simulation environment GENIUS normalizes the time $t$ such that $t \in [0,1]$. 
 
 ### Discount Factor
-Apart from a deadline, a negotiation session may also feature a **discount factor** $d$, which decreases the utility of the bids under negotiation as time passes. It is bounded in range $d \in [0, 1]$. Utility of a bid at the normalized time $t$ from an agent $U_d^t(b_a)$ is calculated as:
+Apart from a deadline, a negotiation session may also feature a **discount factor** $d$, which decreases the utility of the bids under negotiation as time passes. It is bounded in range $d \in [0, 1]$. The utility of a bid at the normalized time $t$ from an agent $U_d^t(b_a)$ is calculated as:
 
 \begin{equation}
 U_d^t(b_a) = U(b_a) \cdot d^{t} 
@@ -155,7 +155,7 @@ U_d^t(b_a) = U(b_a) \cdot d^{t}
 where $U(b_a)$ is the utility of the bid without the influence of the discount factor.
 
 !!! note
-    **Practice**: What will happen if $d = 1$? If $d$ is very small or very high, what will be the affect on the negotiation?
+    **Practice**: What will happen if $d = 1$? If $d$ is very small or very high, what will be the effect on the negotiation?
 
 !!! warning
     Time pressure has little meaning if the profile is not defined in terms of utilities, e.g. partially ordered preference profiles.
@@ -164,24 +164,24 @@ where $U(b_a)$ is the utility of the bid without the influence of the discount f
 !!! warning
     Reservation values also gets discounted in the same way. 
 
-# Task 0: Practice SOAP with Paper!
+# Task 0: Practice SAOP with Paper!
 
 Have a group with three people from the lab and try to negotiate about which laptop to buy according to this protocol. 
 
 1. Make everybody in the group to have **a piece of paper** and **a pen**.
 2. Everybody needs to write down their preferences as in Additive Utility Space preference profiles in **laptop domain** from the previous lab. Set some weights and evaluation values of your preferences. 
-3. **Start negotiating according to SOAP for only 5 rounds**.
+3. **Start negotiating according to SAOP for only 5 rounds**.
 4. Everybody calculates their own utilities gained at the end of negotation, write it down.
-5. Shuffle the preference profile papers and make sure that everybody get a unique one.
+5. Shuffle the preference profile papers and make sure that everybody gets a unique one.
 6. Do step 3 again until everybody used every possible preference profile.
 7. Average your negotiating performance. Decide who is the winner.
-8. Discuss with your peers about the wining strategy. 
+8. Discuss with your peers about the winning strategy. 
 
 
 # Task 1: Implement a simple agent for SOAP protocol
 
 ## Subtask 1: Half Best & Half Random
-Try to write an agent that gives best offer for itself for half of the time during the negotiation, the agent should give random offers.
+Try to write an agent that gives the best offer for itself for the first half of the negotiation time and random offers for remaining time.
 
 Use the snippet from below as a starting point.
 
@@ -248,7 +248,7 @@ double time = this.getTimeLine().getTime();
 
 ## Bonus Subtask: Count the counter-offers and accept messages
 
-Try to count the acceptance and counter-offers from which agents. You may think about storing them in a `Map`. 
+Try to count the acceptance and counter-offers from the other agent(s). You may think about storing them in a `Map`. 
 
 # Task 2: Print other factors
 
