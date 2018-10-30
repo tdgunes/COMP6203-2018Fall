@@ -4,6 +4,7 @@
                         	Intelligent Agents
                         _Wednesday, 31 October 2018_
                         University of Southampton
+                        _[Go to Lab Index]("../index.html")_
 
 This lab introduces the protocols in automated negotiation. The protocols determine the overall order of actions during a negotiation. Parties need to stick to this protocol as deviations from the protocol are caught and penalized.
 
@@ -20,7 +21,9 @@ The examples we give on the protocols defined below are going to be in multilate
 
 The protocols that are mentioned in this section, do not have a third-party agent that handles communication between negotiatiors.
 
-### **[SAOP: Stacked Alternating Offers Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/StackedAlternatingOffersProtocol.html)**
+### **[SAOP: Stacked Alternating Offers 
+
+Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/StackedAlternatingOffersProtocol.html)**
 
 According to this protocol [#Aydoğan2017], all of the participants around the table get a turn per round; turns are taken clock-wise around the table. The first party starts the negotiation with an offer that is observed by all others immediately. Whenever an offer is made the next party in line can take the following actions:
 
@@ -30,6 +33,9 @@ According to this protocol [#Aydoğan2017], all of the participants around the t
 
 !!! note
     This process is repeated in a turn taking clock-wise fashion until reaching an agreement or reaching the deadline. To reach an agreement, all parties should accept the offer. If at the deadline no agreement has been reached, the negotiation fails.
+
+!!! warning
+    Don't forget that most agents aim to maximise their utility during the negotiation rather than walking away and getting nothing (There can be a utility for walking-away, which explain this in the next sections.). 
 
 To illustrate:
 
@@ -105,9 +111,15 @@ This protocol is essentialy same as _Alternating Multiple Offers Protocol_, the 
 !!! note:
     **For example**, assume that negotiation ends because of the deadline and $(Dell, 256GB, 13")$ is offered and accepted by a bigger majority than other offers, then everybody has to take this offer because of the protocol.
 
+!!! warning What will happen if there is a tie in Alternating Multiple Offers Protocol and in Alternating Majority Consensus Protocol?
+    * `AlternatingMultipleOffersProtocol`: An agreement is only reached if everybody accepts the bid, otherwise negotiation continues until two conditions: until deadline or an agreement is reached. In this case, there is not a case that there can be a tie.
+    * `AlternatingMajorityConsensusProtocol`: From javadoc: “The offer that is supported by the most parties will stay on the table. If a new offer has more supporting parties it overwrites the old offer.”. In short, the first offer that has the majority's vote is selected and stored. During the negotiation, if any offer gets a higher vote, that offer gets to be stored.  
+
+    
+
 ## Protocols with a Mediator:
 
-The protocols that are mentioned in this section, have a third-party agent that handles communication between negotiatiors. This _mediator_ agent hears all of the bids from all parties and the mediator determines which bid to be voted by others. Mediators determines an outcome by observing the votes.
+The protocols that are mentioned in this section, have a third-party agent that handles communication between negotiatiors. This _mediator_ agent hears all of the bids from all parties and the mediator determines which bid to be voted by others. The mediator determines the outcome by observing the votes from other negotating agents.
 
 ### [Simple Mediator Based Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/SimpleMediatorBasedProtocol.html)
 
@@ -130,6 +142,7 @@ This protocol extends _Simple Mediator Based Protocol_ by changing votes to feed
 
 The mediator generates a different bid in each round as same as before, trying to generate towards to some optimum. The accepted bid is considered as the one that did not get a 'worse' vote from parties.
 
+<!--
 # Other Factors
 
 Negotiation sessions are parametrized with two additional parameters: _time pressure_ (_discount factor_) and _reservation value_. These influence the agents performance throughout the negotiation.
@@ -160,7 +173,8 @@ where $U(b_a)$ is the utility of the bid without the influence of the discount f
 !!! warning
     Reservation values also gets discounted in the same way. 
 
-# Task 0: Practice SAOP with Paper!
+-->
+# Task 1: Practice SAOP with Paper!
 
 Have a group with three people from the lab and try to negotiate about which laptop to buy according to this protocol. 
 
@@ -174,7 +188,7 @@ Have a group with three people from the lab and try to negotiate about which lap
 8. Discuss with your peers about the winning strategy. 
 
 
-# Task 1: Implement a simple agent for SOAP protocol
+# Task 2: Implement a simple agent for SOAP protocol
 
 ## Subtask 1: Half Best & Half Random
 Try to write an agent that gives the best offer for itself for the first half of the negotiation time and random offers for remaining time.
@@ -245,7 +259,7 @@ double time = this.getTimeLine().getTime();
 ## Bonus Subtask: Count the counter-offers and accept messages
 
 Try to count the acceptance and counter-offers from the other agent(s). You may think about storing them in a `Map`. 
-
+<!--
 # Task 2: Print other factors
 
 Try to print discount factor and discounted reservation values in each turn, when your agent is making an action. 
@@ -255,7 +269,7 @@ Accessing discount factor $d$ and reservation value $r$:
 System.out.println("Discount Factor is " + getUtilitySpace().getDiscountFactor());
 System.out.println("Reservation Value is " + getUtilitySpace().getReservationValueUndiscounted());
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+-->
 # Bibliography
 [#Aydoğan2017]: Aydoğan R., Festen D., Hindriks K.V., Jonker C.M. (2017) Alternating Offers Protocols for Multilateral Negotiation. In: Fujita K. et al. (eds) Modern Approaches to Agent-based Complex Automated Negotiation. Studies in Computational Intelligence, vol 674. Springer, Cham https://link.springer.com/chapter/10.1007/978-3-319-51563-2_10#citeas
 
