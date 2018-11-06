@@ -6,20 +6,20 @@
                         University of Southampton
                         _[Go to Lab Index]("../index.html")_
 
-This lab shows how to implement a previous winner ([ANAC2016](http://web.tuat.ac.jp/~katfuji/ANAC2016/)) of the international automated negotiation competition.
+This lab shows how to implement a previous winner ([ANAC2016](http://web.tuat.ac.jp/~katfuji/ANAC2016/))  and got the second place in ([ANAC2017](http://web.tuat.ac.jp/~katfuji/ANAC2017/)), the international automated negotiation competition.
 
 # Theory Crash Course
 
 To get you more familiar with how to implement a more sophisticated agent, we introduce `Caduceus` agent, which got the first in 2016 and a slightly different version got the second in 2017.
 
-To learn theory, have a look at:
+To learn theory in detail, later you can have a look at:
 * [The conference paper](https://link.springer.com/chapter/10.1007/978-3-319-69131-2_27) [#Gunes2017]
 * [The poster](https://tdgunes.com/prima2017poster.pdf)
 * [The presentation](https://tdgunes.com/prima2017presentation.pdf)
 
-of the Caduceus. 
+of the Caduceus. But for this lab, the algorithm given in the next section is enough to complete the tasks.
 
-In short, Caduceus incorporates the strategies of multiple agents. We call it experts. These experts can be agents that we know that they are good in negotiation. Metaphorically, it is as if you ask help from multiple friends and try to combine their opinions.
+In short, Caduceus incorporates the strategies of multiple agents. We call them experts. These experts can be agents that we know that they are good in negotiation. Metaphorically, it is as if you ask help from multiple friends and try to combine their opinions.
 
 This type of combined approaches exist in:
 * Machine Learning
@@ -31,13 +31,16 @@ This type of combined approaches exist in:
 
 ## Caduceus IPO - _Incremental Portfolio Approach_
 
+!!! warning Simple version!
+    Here we explain a simpler version of the Caduceus without a waiting phase. In the competition, Caduceus had `a waiting phase` initially before making any actions. The extra materials above explains the phases in Caduceus, which you can have a look later for your assignment.
+
 Essentially, Caduceus has _a set of experts $A$._ 
 
 \begin{equation}
-A = \{a_i, ..., a_n \}
+A = \{i, ..., n \}
 \end{equation}
 
-A set of _impact_ weights each assigned to the experts.
+A set of `impact weights` each assigned to the experts.
 
 \begin{equation}
 \Omega = \{\omega_i, ..., \omega_n \}
@@ -53,9 +56,9 @@ Therefore, Caduceus' algorithm _IPO variation_ a slightly easier to implement ve
         * $\ell_{bid} \leftarrow \ell_{bid} + 1$
     * **else**
         * $\ell_{accept} \leftarrow \ell_{accept} + 1$
-* **if** $\ell_{accept}  > \ell_{bid}$ **then return** $I^{accept}$
+* **if** $\ell_{accept}  > \ell_{bid}$ **then do action** $I^{accept}$
 * **else**
-    **return** a bid $b^{'}$ from [weighted random sample set](https://stackoverflow.com/questions/6052603/fast-weighted-random-selection-from-very-large-set-of-values) $B$ according to $\Omega$
+    **do action** $I^{offer}$ with a bid $b^{'}$ from [weighted random sample set](https://stackoverflow.com/questions/6052603/fast-weighted-random-selection-from-very-large-set-of-values) $B$ according to $\Omega$
 
 where:
 
@@ -64,6 +67,41 @@ where:
 * $\ell_{bid}$: the number of experts that generates _bid action_ 
     * i.e. the number of experts that recommend making a counter offer
 * $a^{'}_i$: action that agent i recommends to Caduceus to take
+* $I^{type}$: action type, for instance:
+    * $I^{offer}$ is making an offer 
+    * $I^{accept}$ is accepting offer that is on the table.
+
+!!! note How to determine the `impact weights`?
+    You can make multiple tournaments beforehand to determine the performance of the experts.
+
+# Task 0: Caduceus on Paper
+
+Assume that Caduceus IPO is on the negotiation table with other opponent agents, according to SAOP protocol. Caduceus has these experts:
+
+\begin{equation}
+A = \{AgentFoo, AgentBar, AgentFum\}
+\end{equation}
+
+which, you set their `impact weights` as.
+
+\begin{equation}
+\Omega = \{0.2, 0.3, 0.5\}
+\end{equation}
+
+You recieve a new offer from one of your opponents:
+
+\begin{equation}
+b_{opp_1} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{13}^{"}) 
+\end{equation}
+
+You ask experts for their opinions:
+
+* AgentFoo says `Accept`.
+* AgentBar says `Counter Offer`: $(\textit{Brand: }\text{HP},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{15}^{"})$
+* AgentBar says `Counter Offer`: $(\textit{Brand: }\text{Apple},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{17}^{"})$
+
+!!! error
+    Which actions would Caduceus take? Which one is more likely?
 
 # Task 1: Implement Caduceus IPO - _Incremental Portfolio_
 
@@ -91,7 +129,7 @@ Implement _Crossover Strategy_ of Caduceus: Algorithm 1.2 without _waiting phase
 *                          +---------+--------+                                  *
 *                                    ^                                           *
 *                                    |                                           *
-*                                    | combines opinons                          *
+*                                    | combines opinions                         *
 *                                    |                                           *
 *                           +----------------+                                   *
 *             +------------>|    Caduceus    |<--------------+                   *
@@ -120,13 +158,16 @@ Implement _Crossover Strategy_ of Caduceus: Algorithm 1.2 without _waiting phase
 [Figure [fig1]: CO version of Caduceus combines experts opinions]
 
 
-!!! note
+!!! warning
     The modification that you are going to do to IPO is changing how the bid is generated. In _CO_ version pick the values of the issues that are offered the most by the experts.
 
-# Bonus Task: Further improvements
+!!! error
+    Explain how the opinions are combined, which is shown in the figure above.
 
-* Instead of each agent has same impact on the votes, how about using weights to vote?
-* Try to come up with an heuristic to find weights of each expert.
+# Bonus Tasks: Further improvements
+
+* Simple: Instead of each agent has same impact on the votes, how about using weights to vote?
+* Hard: Try to come up with an heuristic to find weights of each expert.
 
 
 # Bibliography
