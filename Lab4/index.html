@@ -21,7 +21,7 @@ of the Caduceus. But for this lab, the algorithm given in the next section is en
 
 In short, Caduceus incorporates the strategies of multiple agents. We call them experts. These experts can be agents that we know that they are good in negotiation. Metaphorically, it is as if you ask help from multiple friends and try to combine their opinions.
 
-This type of combined approaches exist in:
+This type of combined approaches exists in:
 * Machine Learning
     * [Ensemble Learning](https://en.wikipedia.org/wiki/Ensemble_learning)
     * Algorithm portfolios 
@@ -46,7 +46,7 @@ A set of `impact weights` each assigned to the experts.
 \Omega = \{\omega_i, ..., \omega_n \}
 \end{equation}
 
-Therefore, Caduceus' algorithm _IPO variation_ a slightly easier to implement version for generating bids is:
+Therefore, Caduceus' algorithm _IPO variation_ (a slightly easier to implement version) for generating bids is:
 
 * $B \leftarrow \{\}$
 * **for each** $i \in A$ **do**
@@ -58,7 +58,7 @@ Therefore, Caduceus' algorithm _IPO variation_ a slightly easier to implement ve
         * $\ell_{accept} \leftarrow \ell_{accept} + 1$
 * **if** $\ell_{accept}  > \ell_{bid}$ **then do action** $I^{accept}$
 * **else**
-    **do action** $I^{offer}$ with a bid $b^{'}$ from [weighted random sample set](https://stackoverflow.com/questions/6052603/fast-weighted-random-selection-from-very-large-set-of-values) $B$ according to $\Omega$
+    **do action** $I^{offer}$ with a bid $b^{'}$ from the [weighted random sample set](https://stackoverflow.com/questions/6052603/fast-weighted-random-selection-from-very-large-set-of-values) that is formed by $B$ according to $\Omega$
 
 where:
 
@@ -82,7 +82,7 @@ Assume that Caduceus IPO is on the negotiation table with other opponent agents,
 A = \{AgentFoo, AgentBar, AgentFum\}
 \end{equation}
 
-which, you set their `impact weights` as.
+for whom you set the `impact weights` as
 
 \begin{equation}
 \Omega = \{0.2, 0.3, 0.5\}
@@ -105,15 +105,17 @@ You ask experts for their opinions:
 
 # Task 1: Implement Caduceus IPO - _Incremental Portfolio_
 
+!!! warning
+    For importing other agents just write their name somewhere in the code and the IDE will suggest the right `import` statement.
 
 !!! warning
     Make sure the expert agents set are receiving the messages from the opponent agents.
 
 !!! warning
-    You can pick your experts from previous competitions. But be careful, if you are going to use agents from:
-        * From ANAC 2016: agents protocol was set to be SOAP.
-        * From ANAC 2017: agents can access data from their past negotiations form a tournament. Check the details [here](http://web.tuat.ac.jp/~katfuji/ANAC2017/).
-        * From ANAC 2019 (upcoming): agents which can work with partially ordered preference profiles will be used, protocol is expected to be bilateral version of SOAP.
+    You can pick your experts from previous competitions. But be careful, if you are going to use agents since
+        * From ANAC 2016: agents protocol was set to be SAOP.
+        * From ANAC 2017: agents can access data from their past negotiations of a tournament. Check the details [here](http://web.tuat.ac.jp/~katfuji/ANAC2017/).
+        * From ANAC 2019 (upcoming): agents which can work with partially ordered preference profiles will be used and the protocol is expected to be a bilateral version of SAOP.
 
 # Task 2: Implement Caduceus CO - _Crossover_
 
@@ -139,20 +141,18 @@ Implement _Crossover Strategy_ of Caduceus: Algorithm 1.2 without _waiting phase
 *             |                      |                       |                   *
 *             |                      |                       |                   *
 *             |w_{parsagent} = 0.35  | w_{atlas3} = 0.4      | w_{kawaii} = 0.25 *
-*+----------- | -------------------- | --------------------- | ----------+       *
-*|     b_{parsagent}            b_{atlas3}             b_{kawaii}        |       *
-*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
-*|  |    Brand|HP      |   |    Brand|Dell    |    |    Brand|HP      |  |       *
-*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
-*|  |HardDrive|256GB   |   |HardDrive|512GB   |    |HardDrive|1TB     |  |       *
-*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
-*|  |  Monitor|13"     |   |  Monitor|17"     |    |  Monitor|17"     |  |       *
-*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
-*|            ^                      ^                       ^           |       *
-*|            |                      |                       |           |       * 
-*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*+------------+----------------------+-----------------------+-----------+       *
+*|  +------------------+   +------------------+    +------------------+  |       *
 *|  |    ParsAgent     |   |      Atlas3      |    |      Kawaii      |  |       *
 *|  +------------------+   +------------------+    +------------------+  |       *
+*|     b_{parsagent}            b_{atlas3}             b_{kawaii}        |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |    Issue|HP      |   |    Issue|Dell    |    |    Issue|HP      |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |    Brand|256GB   |   |    Brand|512GB   |    |    Brand|1TB     |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |HardDrive|13"     |   |HardDrive|17"     |    |HardDrive|17"     |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
 *|                                                                       |       *
 *|                                Experts                                |       *
 *+-----------------------------------------------------------------------+       *
@@ -161,15 +161,15 @@ Implement _Crossover Strategy_ of Caduceus: Algorithm 1.2 without _waiting phase
 
 
 !!! warning
-    The modification that you are going to do to IPO is changing how the bid is generated. In _CO_ version pick the values of the issues that are offered the most by the experts.
+    The modification that you are going to do to IPO is changing how the bid is generated. In the _CO_ version you need to pick the value of each issue that is offered the most by the experts.
 
 !!! error
-    Explain how the opinions are combined, which is shown in the figure above.
+    Explain how the opinions are combined (it can be deduced from the figure above).
 
 # Bonus Tasks: Further improvements
 
-* Simple: Instead of each agent has same impact on the votes, how about using weights to vote?
-* Hard: Try to come up with an heuristic to find weights of each expert.
+* Simple: Instead of each agent having the same impact on the votes, how about using weights to vote? (They could be the same as the weights for choosing the new bid)
+* Hard: Try to come up with a heuristic to find the weight of each expert.
 
 
 # Bibliography
