@@ -1,0 +1,273 @@
+              <meta charset="utf-8" emacsmode="-*- markdown -*-">
+
+                            **COMP6203: Lab #3**
+                        	Intelligent Agents
+                        _Wednesday, 31 October 2018_
+                        University of Southampton
+                        _[Go to Lab Index]("../index.html")_
+
+This lab introduces the protocols in automated negotiation. The protocols determine the overall order of actions during a negotiation. Parties need to stick to this protocol as deviations from the protocol are caught and penalized.
+
+# Theory Crash Course
+
+This section provides the essential theory to understand how agents communicate with each other to handle negotiations. First some definitions:
+
+* **Bilateral**: Only two agents are participating in the negotiation session.
+* **Multilateral**:  Usually refers to more than two agents participating in the negotiation session.
+
+The examples we give on the protocols defined below are going to be in multilateral settings. However, bilateral settings are also possible with these protocols.
+
+## Protocols without a Mediator
+
+The protocols that are mentioned in this section, do not have a third-party agent that handles communication between negotiatiors.
+
+### **[SAOP: Stacked Alternating Offers Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/StackedAlternatingOffersProtocol.html)**
+
+According to this protocol [#Aydoğan2017], all of the participants around the table get a turn per round; turns are taken clock-wise around the table. The first party starts the negotiation with an offer that is observed by all others immediately. Whenever an offer is made the next party in line can take the following actions:
+
+1. Make a counter offer (_thus rejecting and overriding the previous offer_)
+2. Accept the offer
+3. Walk away (e.g. _ending the negotiation without any agreement_)
+
+!!! note
+    This process is repeated in a turn taking clock-wise fashion until reaching an agreement or reaching the deadline. To reach an agreement, all parties should accept the offer. If at the deadline no agreement has been reached, the negotiation fails.
+
+!!! warning
+    Don't forget that most agents aim to maximise their utility during the negotiation rather than walking away and getting nothing (There can be a utility for walking-away, which explain this in the next sections.). 
+
+To illustrate:
+
+**Round 1**: 
+
+************************************************
+*Agent A                               Agent B *
+*    │    ┌─────────────────────────┐          *
+*    │    │                         │          *
+*    │    │  ┌────────────────────┐ │          *
+*    └────┼─▶│  Dell, 256GB, 13"  │ │          *
+*         │  └────────────────────┘ │          *
+*         │                         │          *
+*         └─────────────────────────┘          *
+*                                              *
+*                   Agent C                    *
+************************************************
+[Figure [firstrounds1]: _Agent A_ makes an offer]
+
+
+The second party can *accept this offer*, *make a counter offer* or *walk away*. Let's assume that Agent B makes a counter-offer.
+
+************************************************
+*Agent A                               Agent B *
+*         ┌─────────────────────────┐      │   *
+*         │ ┌────────────────────┐  │      │   *
+*         │ │┌───────────────────┴┐ │      │   *
+*         │ └┤   HP, 256GB, 17"   │◀┼──────┘   *
+*         │  └────────────────────┘ │          *
+*         │                         │          *
+*         └─────────────────────────┘          *
+*                                              *
+*                   Agent C                    *
+************************************************
+[Figure [firstrounds2]: _Agent B_ makes a counter offer]
+
+
+Assume that Agent C and Agent A accept the offer on the negotiation table. Since they all agree on this offer, the negotiation ends with this offer.
+
+************************************************
+*Agent A                               Agent B *
+*  ─┐ ┌───────┬─────────────────────┐      │   *
+*   └▶│Accept!├──────────────────┐  │      │   *
+*     └───┬─┬┬┴──────────────────┴┐ │      │   *
+*         │ └┤   HP, 256GB, 17"   │◀┼──────┘   *
+*         │  └─────────────────┬──┴─┴──┐       *
+*         │                  ┌▶│Accept!│       *
+*         └──────────────────┼─┴───────┘       *
+*                            │                 *
+*                   Agent C ─┘                 *
+************************************************
+[Figure [firstrounds3]: _Agent C_ and _Agent A_ accept _Agent B_'s offer.]
+
+
+This protocol is used in the international negotiation competition multiple times. For more about this, check [GENIUS's User Guide Section 2.1](https://tracinsy.ewi.tudelft.nl/pub/svn/Genius/doc/userguide.pdf), [ExampleAgent Wiki](https://github.com/tdgunes/ExampleAgent/wiki/Stacked-Alternating-Offers-Protocol) and [a question from previous year](https://github.com/tdgunes/ExampleAgent/issues/6).
+
+The next protocols are good to know, but our main focus will be on SAOP.
+
+
+### [Alternating Multiple Offers Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/AlternatingMultipleOffersProtocol.html)
+
+There are two phases that consecutively happen in negotiation sessions with this protocol:
+
+* **Bidding Phase** *(every even round (round 0, round 2, ...))*: Each agent submits a bid to the table (i.e. negotiation system).
+* **Voting Phase:** *(every odd round (round 1, round 3, ...))* Each agent observes every bid from every agent. Each bid is voted by each agent. Their vote can be accept or reject. 
+
+Before bidding phase starts again, if a bid gets accept votes from all parties, the negotiation ends with this bid. 
+
+### [Alternating Majority Consensus Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/AlternatingMajorityConsensusProtocol.html)
+
+This protocol is essentialy same as _Alternating Multiple Offers Protocol_, the main difference is that the protocol keeps track of **the acceptance of offers**. If the negotiation ends without any acceptance of an offer, the offer that got most accepts is used for agreement. As in previous protocol when an offer is accepted before the deadline by everybody, the negotiation ends.
+
+!!! note:
+    **For example**, assume that negotiation ends because of the deadline and $(Dell, 256GB, 13")$ is offered and accepted by a bigger majority than other offers, then everybody has to take this offer because of the protocol.
+
+!!! warning What will happen if there is a tie in Alternating Multiple Offers Protocol and in Alternating Majority Consensus Protocol?
+    * `AlternatingMultipleOffersProtocol`: An agreement is only reached if everybody accepts the bid, otherwise negotiation continues until two conditions: until deadline or an agreement is reached. In this case, there is not a case that there can be a tie.
+    * `AlternatingMajorityConsensusProtocol`: From javadoc: “The offer that is supported by the most parties will stay on the table. If a new offer has more supporting parties it overwrites the old offer.”. In short, the first offer that has the majority's vote is selected and stored. During the negotiation, if any offer gets a higher vote, that offer gets to be stored.  
+
+    
+
+## Protocols with a Mediator:
+
+The protocols that are mentioned in this section, have a third-party agent that handles communication between negotiatiors. This _mediator_ agent hears all of the bids from all parties and the mediator determines which bid to be voted by others. The mediator determines the outcome by observing the votes from other negotating agents.
+
+### [Simple Mediator Based Protocol](https://tdgunes.com/genius-9.1.1-javadoc/genius/core/protocol/SimpleMediatorBasedProtocol.html)
+
+In this protocol:
+
+* The mediator creates a bid in each round.
+* Other negotiating parties, either accept or reject as before. But they can not provide a counter-offer. 
+* The mediator informs all parties about the outcome of the round.
+
+This continues until the deadline is reached or a bid from mediator agent is accepted by every negotiating agent.  
+
+There are several implemented mediators in GENIUS:
+
+* `RandomFlippingMediator`: generates random bids by flipping one issue of the current offer. 
+* `FixedOrderFlippingMediator`: same as `RandomFlippingMediator` with a fixed-seed random generator.
+
+### Mediator Feedback Based Protocol
+
+This protocol extends _Simple Mediator Based Protocol_ by changing votes to feedbacks. Instead of negotiating agents provide a binary vote (i.e. [Reject, Accept]), with this protocol they can provide a feedback (i.e. ['better', 'worse', 'same']) to the mediator. 
+
+The mediator generates a different bid in each round as same as before, trying to generate towards to some optimum. The accepted bid is considered as the one that did not get a 'worse' vote from parties.
+
+<!--
+# Other Factors
+
+Negotiation sessions are parametrized with two additional parameters: _time pressure_ (_discount factor_) and _reservation value_. These influence the agents performance throughout the negotiation.
+
+## Reservation Value
+
+`Reservation Value` is the utility of _walking away_. In other words, it is a real-valued threshold below which a rational negotiating agent should not accept any offers.
+
+!!! note
+    Each agent may have a different reservation value. They are defined within a preference profile.
+
+## Time Pressure
+
+Each negotiation session has a predefined deadline, it can be in real time as _seconds_ or _rounds_. The simulation environment GENIUS normalizes the time $t$ such that $t \in [0,1]$. 
+
+### Discount Factor
+Apart from a deadline, a negotiation session may also feature a **discount factor** $d$, which decreases the utility of the bids under negotiation as time passes. It is bounded in range $d \in [0, 1]$. The utility of a bid at the normalized time $t$ from an agent $U_d^t(b_a)$ is calculated as:
+
+\begin{equation}
+U_d^t(b_a) = U(b_a) \cdot d^{t} 
+\end{equation}
+
+where $U(b_a)$ is the utility of the bid without the influence of the discount factor.
+
+!!! note
+    **Practice**: What will happen if $d = 1$? If $d$ is very small or very high, what will be the effect on the negotiation?
+
+!!! warning
+    Reservation values also gets discounted in the same way. 
+
+-->
+# Task 1: Practice SAOP with Paper!
+
+Have a group with three people from the lab and try to negotiate about which laptop to buy according to this protocol. 
+
+1. Take three negotiation sheets, one per player.
+2. Read the instructions and answer the questions. 
+3. Discuss with your peers about the winning strategy. 
+4. You can also experiment other settings by mixing the profiles from the two different scenarios.
+
+# Task 2: Implement a simple agent for SOAP protocol
+
+## Subtask 1: Half Best & Half Random
+Try to write an agent that gives the best offer for itself for the first half of the negotiation time and random offers for remaining time.
+
+Use the snippet from below as a starting point.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+import java.util.List;
+
+import genius.core.AgentID;
+import genius.core.Bid;
+import genius.core.actions.Accept;
+import genius.core.actions.Action;
+import genius.core.actions.Offer;
+import genius.core.parties.AbstractNegotiationParty;
+import genius.core.parties.NegotiationInfo;
+
+public class YourAgentsName extends AbstractNegotiationParty {
+    private final String description = "YourAgentsName";
+
+    @Override
+    public void init(NegotiationInfo info) {
+        super.init(info);
+
+    }
+
+    @Override
+    public Action chooseAction(List< Class< ? extends Action > > list) {
+        
+    }
+
+    @Override
+    public void receiveMessage(AgentID sender, Action act) {
+        super.receiveMessage(sender, act);
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Getting the best bid: 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+
+
+private Bid getMaxUtilityBid() {
+    try {
+        return this.utilitySpace.getMaxUtilityBid();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Creating random bids:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+Bid randomBid = this.generateRandomBid();
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Accessing normalized time $t \in [0, 1]$:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+double time = this.getTimeLine().getTime();
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Bonus Subtask: Count the counter-offers and accept messages
+
+Try to count the acceptance and counter-offers from the other agent(s). You may think about storing them in a `Map`. 
+<!--
+# Task 2: Print other factors
+
+Try to print discount factor and discounted reservation values in each turn, when your agent is making an action. 
+
+Accessing discount factor $d$ and reservation value $r$:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+System.out.println("Discount Factor is " + getUtilitySpace().getDiscountFactor());
+System.out.println("Reservation Value is " + getUtilitySpace().getReservationValueUndiscounted());
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+# Bibliography
+[#Aydoğan2017]: Aydoğan R., Festen D., Hindriks K.V., Jonker C.M. (2017) Alternating Offers Protocols for Multilateral Negotiation. In: Fujita K. et al. (eds) Modern Approaches to Agent-based Complex Automated Negotiation. Studies in Computational Intelligence, vol 674. Springer, Cham https://link.springer.com/chapter/10.1007/978-3-319-51563-2_10#citeas
+
+<!-- Markdeep: -->
+<script>window.markdeepOptions = {"tocStyle": "medium"};</script>
+
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+

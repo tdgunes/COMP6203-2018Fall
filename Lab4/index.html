@@ -89,7 +89,6 @@ _Defined in [MultilateralAnalysis.java:313](https://tracinsy.ewi.tudelft.nl/pubt
 The Nash point is also known as the Nash bargaining solution (NOT to be confused with Nash equilibrium), and this is the point which maximises the product of the utilities minus the disagreement utility. 
 Formally, the Nash bargaining solution or Nash point is calculated by:
 
-
 \begin{equation}
 	b_{nash} = \arg\max_{b} \prod_{i=1}^n \left(U_i(b)-U_i(b_{disagr})\right)
 \end{equation}
@@ -108,11 +107,9 @@ To see how this point is found, have a look at its implementation ([Multilateral
 3. Locate the logs: e.g. `ExampleAgent/genius-{version}/log/tournament-*.(xml|log)`
 4. Open `tournament-*.logStats.xml`, you can find the mean results of the metrics that we mentioned.
     * While you are developing your agent, you can check these for your agents performance
-5. Try to get familiar on how to plot these results (MS Excel, Numbers, matplotlib, Matlab)
 
-# Bonus Task: Compute & plot pareto efficient frontier 
+Try to get familiar on how to plot these results (MS Excel, Numbers, matplotlib, Matlab)
 
-Compute and draw pareto efficient frontier in a graph such as Figure [pareto]. 
 
 # Task 2: Parse tournament-*.log.xml, calculate additional metrics
 
@@ -121,7 +118,7 @@ Compute and draw pareto efficient frontier in a graph such as Figure [pareto].
     * You can use MS Excel with `tournament-*log.csv` directly with pivot tables.
         * More on this is in Genius User Guide.
 
-2. Try to come up with additional metrics. Some tips:
+2. (Extra) Try to come up with additional metrics. Some tips:
     * How is your agent performing under:
         * big/small domains many issues and values)
         * discrete, continuous issues 
@@ -130,6 +127,31 @@ Compute and draw pareto efficient frontier in a graph such as Figure [pareto].
 !!! note Running tournaments from command line. 
     You can define multiple tournaments in `an xml file` and GENIUS can run them. Have a look at the GENIUS User Guide Section 5.3 and [here](https://github.com/tdgunes/ExampleAgent/wiki/Running-a-negotiation-session-via-command-line).
 
+# Bonus Task: Compute & plot pareto efficient frontier 
+
+Compute and draw pareto efficient frontier of two random preference profiles from laptop domain in a graph such as Figure [pareto]. 
+
+## _Hints_
+
+1. X axis can be for Agent 1, Y axis can be for Agent 2's utilities.
+2. You can use `matplotlib` for this task. For example, for a simple scatter plot:
+3. **Suggestion:** You can use [Google Colabratory](https://colab.research.google.com), if you don't know how to install `Python` and `matplotlib`.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~python
+import matplotlib.pyplot as plt
+# for instance:
+# X = [0.3, ...,]
+# Y = [0.6, ...,]
+# TODO: get X and Y, plot:
+plt.plot(X, Y, "yo") # yo = yellow dot
+# TODO: calculate pareto efficient frontier points as X_p and Y_p, plot:
+plt.plot(X_p, Y_p, "bs") # bs = blue square
+plt.xlabel("Agent 1") 
+plt.ylabel("Agent 2") 
+plt.show()
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+3. Confirm that you points (shown as blue squares) are the pareto efficent frontier. 
 
 
 # Bibliography
