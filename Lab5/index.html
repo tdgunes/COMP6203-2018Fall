@@ -1,142 +1,183 @@
               <meta charset="utf-8" emacsmode="-*- markdown -*-">
 
-                            **COMP6203: Lab #4**
+                            **COMP6203: Lab #5**
                         	Intelligent Agents
-                        _Wednesday, 7 November 2018_
+                        _Wednesday, 14 November 2018_
                         University of Southampton
                         _[Go to Lab Index]("../index.html")_
 
-This lab shows how to evaluate your agent against various benchmark metrics. 
+This lab shows how to implement a previous winner ([ANAC2016](http://web.tuat.ac.jp/~katfuji/ANAC2016/))  and got the second place in ([ANAC2017](http://web.tuat.ac.jp/~katfuji/ANAC2017/)), the international automated negotiation competition.
 
 # Theory Crash Course
 
-There are multiple quality metrics that can help you to analyse your negotiating agent:
+To get you more familiar with how to implement a more sophisticated agent, we introduce `Caduceus` agent, which got the first in 2016 and a slightly different version got the second in 2017.
 
-## Definitions
+To learn theory in detail, later you can have a look at:
+* [The conference paper](https://link.springer.com/chapter/10.1007/978-3-319-69131-2_27) [#Gunes2017]
+* [The poster](https://tdgunes.com/prima2017poster.pdf)
+* [The presentation](https://tdgunes.com/prima2017presentation.pdf)
 
-* **A negotiation session**: A single run of a negotiation, beforehand the names of agents, which preference profiles that they are assigned to and some other parameters needs to be given to make a single run.
+of the Caduceus. But for this lab, the algorithm given in the next section is enough to complete the tasks.
 
-* **A tournament**: Consists of many negotiation sessions. A tournament takes a set of negotiation agents, a domain (with many preference profiles.) and some parameters to determine negotiation sessions such as:
-    * Deadline
-    * Repetitions (_repetition of a negotiation session_)
-    * Data Persistency (_access to data of the previous negotiation sessions_)
-    * Protocol
+In short, Caduceus incorporates the strategies of multiple agents. We call them experts. These experts can be agents that we know that they are good in negotiation. Metaphorically, it is as if you ask help from multiple friends and try to combine their opinions.
 
-## Quality Metrics
-### Individual Utility
+This type of combined approaches exists in:
+* Machine Learning
+    * [Ensemble Learning](https://en.wikipedia.org/wiki/Ensemble_learning)
+    * Algorithm portfolios 
+* Artificial Intelligence 
+    * Genetic Algorithms (_slightly similar_)
+    * Mixture of Experts
 
-The utility that is gained from the perspective of an agent. For Agent A, for instance it is:
+## Caduceus IPO - _Incremental Portfolio Approach_
+
+!!! warning Simple version!
+    Here we explain a simpler version of the Caduceus without a waiting phase. In the competition, Caduceus had `a waiting phase` initially before making any actions. The extra materials above explains the phases in Caduceus, which you can have a look later for your assignment.
+
+Essentially, Caduceus has _a set of experts $A$._ 
 
 \begin{equation}
-U_{A}(b_{accepted}) = \sum_{i=1}^{n} \omega_i \frac{eval(v^{i}_{c_i})}{max(eval(I_i))}
+A = \{i, ..., n \}
 \end{equation}
 
-
-$b_{accepted}$ is the accepted bid that is accepted by everybody. 
-
-!!! note
-    If in the negotiation environment:
-        * the protocol is SOAP
-        * an agent walks-away 
-        * or deadline is reached
-    Everyone gets their reservation value (if discounted, they get discounted reservation value) as their own individual utility.
-
-###  Social Welfare 
-
-_Defined in [MultilateralAnalysis.java:299](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L299)_: 
-
-The social welfare (SW) is the sum of all the individual utilities of all agents. For a bid $b$ and $n$ agents, this is:
+A set of `impact weights` each assigned to the experts.
 
 \begin{equation}
-SW(b) = \sum_{i=1}^{n} U_{i}(b)
+\Omega = \{\omega_i, ..., \omega_n \}
 \end{equation}
 
+Therefore, Caduceus' algorithm _IPO variation_ (a slightly easier to implement version) for generating bids is:
 
-### Distance to Pareto Efficient Frontier
+* $B \leftarrow \{\}$
+* **for each** $i \in A$ **do**
+    * $a^{'}_i \leftarrow$ query agent $i$ with action $a$ in time $t$
+    * **if** $type(a^{'}_i) = I^{bid}$ **then**
+        * $B \leftarrow B \cup \{a^{'}_i\}$
+        * $\ell_{bid} \leftarrow \ell_{bid} + 1$
+    * **else**
+        * $\ell_{accept} \leftarrow \ell_{accept} + 1$
+* **if** $\ell_{accept}  > \ell_{bid}$ **then do action** $I^{accept}$
+* **else**
+    **do action** $I^{offer}$ with a bid $b^{'}$ from the [weighted random sample set](https://stackoverflow.com/questions/6052603/fast-weighted-random-selection-from-very-large-set-of-values) that is formed by $B$ according to $\Omega$
 
-_Defined in [MultilateralAnalysis.java:322](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L322)_: 
+where:
 
-The accepted bid's distance to the Pareto efficient frotnier.
+* $\ell_{accept}$: the number of experts that generates _accept action_, 
+    * i.e. the number of experts that recommend accepting the offer that is on the table
+* $\ell_{bid}$: the number of experts that generates _bid action_ 
+    * i.e. the number of experts that recommend making a counter offer
+* $a^{'}_i$: action that agent i recommends to Caduceus to take
+* $I^{type}$: action type, for instance:
+    * $I^{offer}$ is making an offer 
+    * $I^{accept}$ is accepting offer that is on the table.
 
-![Figure [pareto]: Available bids in the pareto frontier](pareto.png width="500px")
+!!! note How to determine the `impact weights`?
+    You can make multiple tournaments beforehand to determine the performance of the experts.
 
-_"A negotiation outcome is said to be Pareto efficient if there is no other outcome that will make at least one agent better off without making at least one other agent worse off. Intuitively, if a negotiation outcome is not Pareto efficient, then there is another outcome that will make at least one agent happier while keeping eve- ryone else at least as happy."_ [#Jennings2001]
- 
-The Pareto efficient frontier (or simply Pareto frontier or Pareto curve) is the set of all Pareto efficient outcomes.
- 
-The distance is calculated by getting all the bids which are on the curve. Iterating each bid and getting minimum distance, formally (following example Figure [pareto]):
+# Task 0: Caduceus on Paper
+
+Assume that Caduceus IPO is on the negotiation table with other opponent agents, according to SAOP protocol. Caduceus has these experts:
 
 \begin{equation}
-ParetoDist(b) = min(\{||U(b) -  U(b_{1})||, ..., ||U(b) -  U(b_{j})||, ..., ||U(b) -  U(b_{k})||\})
+A = \{AgentFoo, AgentBar, AgentFum\}
 \end{equation}
 
-where $b_k$ is an outcome/bid on the Pareto frontier, $k$ is the number of outcomes on the pareto frontier, and $||U(b_{i}) -  U(b_{j})||$ is the Euclidean distance between two bids and $U(b_{i})$ is a tuple that holds each utility that each agent would gain from bid $b_{i}$, such that:
+for whom you set the `impact weights` as
 
 \begin{equation}
-U(b) = (U_1(b), ..., U_n(b))
+\Omega = \{0.2, 0.3, 0.5\}
 \end{equation}
 
-The [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance) is calculated by:
+You recieve a new offer from one of your opponents:
 
 \begin{equation}
-||U(b)-U(b')||=\sqrt{\sum_{i=1}^n (U_i(b)-U_i(b'))^2}
-\end{equation} 
-
-### Distance to Nash Point 
-
-_Defined in [MultilateralAnalysis.java:313](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L313)_: 
-
-The Nash point is also known as the Nash bargaining solution (NOT to be confused with Nash equilibrium), and this is the point which maximises the product of the utilities minus the disagreement utility. 
-Formally, the Nash bargaining solution or Nash point is calculated by:
-
-
-\begin{equation}
-	b_{nash} = \arg\max_{b} \prod_{i=1}^n \left(U_i(b)-U_i(b_{disagr})\right)
+b_{opp_1} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{13}^{"}) 
 \end{equation}
 
-where $U_i(b_{disagr})$ is the disagreement utility, i.e. the utility agent $i$ receives if there is no agreement (this is zero if there is the reservation value is zero).
-To see how this point is found, have a look at its implementation ([MultilateralAnalysis.java:333](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L333)) in GENIUS. Once the distance is found, the Euclidean distance is again calculated between the accepted bid $b_{a}$ and $b_{nash}$.
-    
+You ask experts for their opinions:
 
-# Task 1: Run a simple tournament and plot these metrics
+* AgentFoo says `Accept`.
+* AgentBar says `Counter Offer`: $(\textit{Brand: }\text{HP},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{15}^{"})$
+* AgentBar says `Counter Offer`: $(\textit{Brand: }\text{Apple},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{17}^{"})$
 
-1. Open the GENIUS user interface
-2. Create a new tournament with these settings:
+!!! error
+    Which actions would Caduceus take? Which one is more likely?
 
-![Figure [tournament]: Tournament settings](tournament.png width="1000px")
+# Task 1: Implement Caduceus IPO - _Incremental Portfolio_
 
-3. Locate the logs: e.g. `ExampleAgent/genius-{version}/log/tournament-*.(xml|log)`
-4. Open `tournament-*.logStats.xml`, you can find the mean results of the metrics that we mentioned.
-    * While you are developing your agent, you can check these for your agents performance
-5. Try to get familiar on how to plot these results (MS Excel, Numbers, matplotlib, Matlab)
+!!! warning
+    For importing other agents just write their name somewhere in the code and the IDE will suggest the right `import` statement.
 
-# Bonus Task: Compute & plot pareto efficient frontier 
+!!! warning
+    Make sure the expert agents set are receiving the messages from the opponent agents.
 
-Compute and draw pareto efficient frontier in a graph such as Figure [pareto]. 
+!!! warning
+    You can pick your experts from previous competitions. But be careful, if you are going to use agents since
+        * From ANAC 2016: agents protocol was set to be SAOP.
+        * From ANAC 2017: agents can access data from their past negotiations of a tournament. Check the details [here](http://web.tuat.ac.jp/~katfuji/ANAC2017/).
+        * From ANAC 2019 (upcoming): agents which can work with partially ordered preference profiles will be used and the protocol is expected to be a bilateral version of SAOP.
 
-# Task 2: Parse tournament-*.log.xml, calculate additional metrics
+# Task 2: Implement Caduceus CO - _Crossover_
 
-1. You can calculate **the standard deviation** of each these metrics to see how much the mean performance deviates. 
-    * You can use a scripting language to parse the log files.
-    * You can use MS Excel with `tournament-*log.csv` directly with pivot tables.
-        * More on this is in Genius User Guide.
+Implement _Crossover Strategy_ of Caduceus: Algorithm 1.2 without _waiting phase_ from the paper. 
 
-2. Try to come up with additional metrics. Some tips:
-    * How is your agent performing under:
-        * big/small domains many issues and values)
-        * discrete, continuous issues 
-        * and so on.
+**********************************************************************************
+*                          +---------+--------+                                  *
+*                          |    Issue|HP      |                                  *
+*                          +---------+--------+                                  *
+*                          |    Brand|512GB   |                                  *
+*                          +---------+--------+                                  *
+*                          |HardDrive|17"     |                                  *
+*                          +---------+--------+                                  *
+*                                    ^                                           *
+*                                    |                                           *
+*                                    | combines opinions                         *
+*                                    |                                           *
+*                           +----------------+                                   *
+*             +------------>|    Caduceus    |<--------------+                   *
+*             |             +----------------+               |                   *
+*             |                      ^                       |                   *
+*             |                      |                       |                   *
+*             |                      |                       |                   *
+*             |                      |                       |                   *
+*             |w_{parsagent} = 0.35  | w_{atlas3} = 0.4      | w_{kawaii} = 0.25 *
+*+------------+----------------------+-----------------------+-----------+       *
+*|  +------------------+   +------------------+    +------------------+  |       *
+*|  |    ParsAgent     |   |      Atlas3      |    |      Kawaii      |  |       *
+*|  +------------------+   +------------------+    +------------------+  |       *
+*|     b_{parsagent}            b_{atlas3}             b_{kawaii}        |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |    Issue|HP      |   |    Issue|Dell    |    |    Issue|HP      |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |    Brand|256GB   |   |    Brand|512GB   |    |    Brand|1TB     |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |HardDrive|13"     |   |HardDrive|17"     |    |HardDrive|17"     |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|                                                                       |       *
+*|                                Experts                                |       *
+*+-----------------------------------------------------------------------+       *
+**********************************************************************************
+[Figure [fig1]: CO version of Caduceus combines experts opinions]
 
-!!! note Running tournaments from command line. 
-    You can define multiple tournaments in `an xml file` and GENIUS can run them. Have a look at the GENIUS User Guide Section 5.3 and [here](https://github.com/tdgunes/ExampleAgent/wiki/Running-a-negotiation-session-via-command-line).
 
+!!! warning
+    The modification that you are going to do to IPO is changing how the bid is generated. In the _CO_ version you need to pick the value of each issue that is offered the most by the experts.
+
+!!! error
+    Explain how the opinions are combined (it can be deduced from the figure above).
+
+# Bonus Tasks: Further improvements
+
+* Simple: Instead of each agent having the same impact on the votes, how about using weights to vote? (They could be the same as the weights for choosing the new bid)
+* Hard: Try to come up with a heuristic to find the weight of each expert.
 
 
 # Bibliography
-[#Jennings2001]: Jennings, N. R., Faratin, P., Lomuscio, A. R., Parsons, S., Wooldridge, M. J., & Sierra, C. (2001). Automated negotiation: prospects, methods and challenges. Group Decision and Negotiation, 10(2), 199-215. http://www.cs.ox.ac.uk/people/michael.wooldridge/pubs/gdn2001.pdf
+[#Gunes2017]: Güneş T. D., Arditi E., and Aydoğan R., “Collective Voice of Experts in Multilateral Negotiation,” in PRIMA 2017: Principles and Practice of Multi-Agent Systems: 20th International Conference, Nice, France, October 30 – November 3, 2017, Proceedings, B. An, A. Bazzan, J. Leite, S. Villata, and L. van der Torre, Eds. Cham: Springer International Publishing, 2017, pp. 450–458.  https://link.springer.com/chapter/10.1007/978-3-319-69131-2_27
 
 <!-- Markdeep: -->
 <script>window.markdeepOptions = {"tocStyle": "medium"};</script>
 
 <style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+
 
