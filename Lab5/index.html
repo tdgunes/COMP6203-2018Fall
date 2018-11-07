@@ -1,8 +1,8 @@
               <meta charset="utf-8" emacsmode="-*- markdown -*-">
 
-                            **COMP6203: Lab #5**
+                            **COMP6203: Lab #4**
                         	Intelligent Agents
-                        _Wednesday, 14 November 2018_
+                        _Wednesday, 7 November 2018_
                         University of Southampton
                         _[Go to Lab Index]("../index.html")_
 
@@ -28,7 +28,7 @@ There are multiple quality metrics that can help you to analyse your negotiating
 The utility that is gained from the perspective of an agent. For Agent A, for instance it is:
 
 \begin{equation}
-U_{a}(b_{accepted}) = \sum_{i=1}^{n} \omega_i \frac{eval(v^{i}_{c_i})}{max(eval(I_i))}
+U_{A}(b_{accepted}) = \sum_{i=1}^{n} \omega_i \frac{eval(v^{i}_{c_i})}{max(eval(I_i))}
 \end{equation}
 
 
@@ -41,40 +41,61 @@ $b_{accepted}$ is the accepted bid that is accepted by everybody.
         * or deadline is reached
     Everyone gets their reservation value (if discounted, they get discounted reservation value) as their own individual utility.
 
-* **Distance to Social Welfare** (_Defined in [MultilateralAnalysis.java:299](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L299)_): The sum of all the individual utilities of all agents.
+###  Social Welfare 
+
+_Defined in [MultilateralAnalysis.java:299](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L299)_: 
+
+The social welfare (SW) is the sum of all the individual utilities of all agents. For a bid $b$ and $n$ agents, this is:
 
 \begin{equation}
-S(b_{a}) = \sum_{i=1}^{n} U_{a}(b_{a})
+SW(b) = \sum_{i=1}^{n} U_{i}(b)
 \end{equation}
 
 
-### Distance to Pareto Curve
+### Distance to Pareto Efficient Frontier
 
-(_Defined in [MultilateralAnalysis.java:322](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L322)_): The accepted bid's distance to pareto curve.
+_Defined in [MultilateralAnalysis.java:322](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L322)_: 
+
+The accepted bid's distance to the Pareto efficient frotnier.
 
 ![Figure [pareto]: Available bids in the pareto frontier](pareto.png width="500px")
 
 _"A negotiation outcome is said to be Pareto efficient if there is no other outcome that will make at least one agent better off without making at least one other agent worse off. Intuitively, if a negotiation outcome is not Pareto efficient, then there is another outcome that will make at least one agent happier while keeping eve- ryone else at least as happy."_ [#Jennings2001]
  
+The Pareto efficient frontier (or simply Pareto frontier or Pareto curve) is the set of all Pareto efficient outcomes.
+ 
 The distance is calculated by getting all the bids which are on the curve. Iterating each bid and getting minimum distance, formally (following example Figure [pareto]):
 
 \begin{equation}
-P(b_{a}) = min(\{||U(b_{a}) -  U(b_{1})||, ..., ||U(b_{a}) -  U(b_{9})||\})
+ParetoDist(b) = min(\{||U(b) -  U(b_{1})||, ..., ||U(b) -  U(b_{j})||, ..., ||U(b) -  U(b_{k})||\})
 \end{equation}
 
-where $||U(b_{i}) -  U(b_{j})||$ is the euclidean distance between two bids and $U(b_{i})$ is a tuple that holds each utility that each agent would gain from bid $b_{i}$, such that:
+where $b_k$ is an outcome/bid on the Pareto frontier, $k$ is the number of outcomes on the pareto frontier, and $||U(b_{i}) -  U(b_{j})||$ is the Euclidean distance between two bids and $U(b_{i})$ is a tuple that holds each utility that each agent would gain from bid $b_{i}$, such that:
 
 \begin{equation}
-U(b_{i}) = (U_1(b_{i}), ..., U_k(b_{i}))
+U(b) = (U_1(b), ..., U_n(b))
 \end{equation}
 
+The [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance) is calculated by:
 
+\begin{equation}
+||U(b)-U(b')||=\sqrt{\sum_{i=1}^n (U_i(b)-U_i(b'))^2}
+\end{equation} 
 
 ### Distance to Nash Point 
 
-_Defined in [MultilateralAnalysis.java:313](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L313)_: Nash point is a certain point in (number of agents) dimensional space, such that all parties are in (nash) equilibrium. Assume that $b_{nash}$ is the nash point, let's say Agent $A$ and Agent $B$ are negotiating end. This bid is accepted. This means that Agent $A$ can not improve his utility without hurting Agent $B$ utility and this must apply for the other way around. [#Jennings2001]
+_Defined in [MultilateralAnalysis.java:313](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L313)_: 
 
-To see how this point is found, have a look at its implementation ([MultilateralAnalysis.java:333](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L333)) in GENIUS. Once the distance is found, the euclidean distance is again calculated between the accepted bid $b_{a}$ and $b_{nash}$.
+The Nash point is also known as the Nash bargaining solution (NOT to be confused with Nash equilibrium), and this is the point which maximises the product of the utilities minus the disagreement utility. 
+Formally, the Nash bargaining solution or Nash point is calculated by:
+
+
+\begin{equation}
+	b_{nash} = \arg\max_{b} \prod_{i=1}^n \left(U_i(b)-U_i(b_{disagr})\right)
+\end{equation}
+
+where $U_i(b_{disagr})$ is the disagreement utility, i.e. the utility agent $i$ receives if there is no agreement (this is zero if there is the reservation value is zero).
+To see how this point is found, have a look at its implementation ([MultilateralAnalysis.java:333](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/browser/src/main/java/genius/core/analysis/MultilateralAnalysis.java#L333)) in GENIUS. Once the distance is found, the Euclidean distance is again calculated between the accepted bid $b_{a}$ and $b_{nash}$.
     
 
 # Task 1: Run a simple tournament and plot these metrics
@@ -89,11 +110,11 @@ To see how this point is found, have a look at its implementation ([Multilateral
     * While you are developing your agent, you can check these for your agents performance
 5. Try to get familiar on how to plot these results (MS Excel, Numbers, matplotlib, Matlab)
 
-# Bonus Task 1: Compute & plot pareto efficient frontier 
+# Bonus Task: Compute & plot pareto efficient frontier 
 
 Compute and draw pareto efficient frontier in a graph such as Figure [pareto]. 
 
-# Bonus Task 2: Parse tournament-*.log.xml, calculate additional metrics
+# Task 2: Parse tournament-*.log.xml, calculate additional metrics
 
 1. You can calculate **the standard deviation** of each these metrics to see how much the mean performance deviates. 
     * You can use a scripting language to parse the log files.
