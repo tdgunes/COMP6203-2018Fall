@@ -6,7 +6,7 @@
                         University of Southampton
                         _[Go to Lab Index]("../index.html")_
 
-Over the next two labs you will implement a simple agent.
+Over the next two labs you will implement a simple agent which does basic opponent modelling, has a simple concession strategy, and deals with uncertainty of the agent preferences.
 
 # Opponent Modelling
 
@@ -18,38 +18,38 @@ We will use a simple approach based on the Johny Black agent: https://secure.ecs
 
 Read section 2.3 of the paper and try to understand how they implement the opponent model. The steps are as follows:
 
-* Start from the example agent (i.e. a working agent which generates random offers). For now assume you know your own preferences.
+1. Start from the example agent (i.e. a working agent which generates random offers). For now assume you know your own preferences (disable the uncertainty).
 
-* First, create a double integer array which keeps track of the frequency of the issue values. 
-That is, for each issue, and each value you want to count how many times you received an offer with that value (see Tables 1 and 2 as examples). Make sure this works 
-for any number of issues and values (the table can get pretty large when the domain gets larger, so to cope with really large domains you have to be a bit
-more clever about this; but for now just use a "naive" approach). 
+2. Then, create a double integer array which keeps track of the frequency of the issue values.  That is, for each issue, and each value you want to count how many times you received an offer with that value (see Tables 1 and 2 as examples). Make sure this works for any number of issues and values (the table can get pretty large when the domain gets larger, so to cope with really large domains you have to be a bit more clever about this; but for now just use a "naive" approach). 
 
-To do this you need to access information about the domain (how many issues, how many discrete values for each issue). 
-An example of how this is done is here: https://github.com/tdgunes/ExampleAgent/wiki/Accessing-the-evaluation-of-a-value 
-(note that you don't need the evaluation of a value at this point, but this is an example how to access the information of the domain)
+!!!
+    To do this you need to access information about the domain (how many issues, how many discrete values for each issue). An example of how this is done is here: https://github.com/tdgunes/ExampleAgent/wiki/Accessing-the-evaluation-of-a-value (note that you don't need the evaluation of a value at this point, but this is an example how to access the information of the domain).
 
-* Now start populating the frequency table. That is, for each incoming bid, update the frequency table. 
-To find out more about how the Bid object work, check the Javadoc, i.e. https://tdgunes.com/genius-9.1.1-javadoc/genius/core/Bid.html
+3. Now start populating the frequency table. That is, for each incoming bid, update the frequency table. 
+!!!
+    To find out more about how the Bid object work, check the Javadoc, i.e. https://tdgunes.com/genius-9.1.1-javadoc/genius/core/Bid.html
 
-Note that you need to match the value to what you have in your table. There are various ways to do this, and requires some basic programming skills and understanding of Java.
+!!!
+    Note that you need to match the value to what you have in your table. There are various ways to do this, and requires some basic programming skills and understanding of Java.
 
-Check that your approach works by running the agent and displaying the output.
+4. Check that your approach works by running the agent and displaying the output.
 
-* Now that you have the table, use the approach from the paper to compute the estimated opponent utility. 
-Again check that it works. Initially, with no information, each of the opponent bids should have equal utility. As you receive more bids from your opponent, the utility estimation should gradually improve.
+5. Now that you have the table, use the approach from the paper to compute the estimated opponent utility. 
+
+6. Again check that it works. Initially, with no information, each of the opponent bids should have equal utility. As you receive more bids from your opponent, the utility estimation should gradually improve.
 
 # Concession Strategy
 
-* Start with a concession strategy which sets the target utility level. You can use a simple linear approach, which starts with the highest possible utility, and then concedes up to a threshold when the time limit is reached. Set this threshold using a variable (e.g. it can be the average between the highest and lowest possible utility). If you want to use a slightly more advanced approach, use a Boulware or Conceder strategy (see slides on negotiation lecture and/or literature). 
+1. Start with a concession strategy which sets the target utility level. You can use a simple linear approach, which starts with the highest possible utility, and then concedes up to a threshold when the time limit is reached. Set this threshold using a variable (e.g. it can be the average between the highest and lowest possible utility). If you want to use a slightly more advanced approach, use a Boulware or Conceder strategy (see slides on negotiation lecture and/or literature). 
 
-* Get the set of all bids which have equal or more utility than the target utility.
+2. Get the set of all bids which have equal or more utility than the target utility.
 
-* Check which one of these bids has the highest opponent utility based on your estimated opponent utility.
+3. Check which one of these bids has the highest opponent utility based on your estimated opponent utility. 
 
-Note that, if the estimated utility were to be exact, such a bid would always be Pareto efficient. Explain why this is.
+!!!
+    Note that, if the estimated utility were to be exact, such a bid would always be Pareto efficient. Explain why this is.
 
-* Offer that bid to your opponent.
+4. Offer that bid to your opponent.
 
 # Bonus Task: Nash Bargaining Solution
 
@@ -57,11 +57,57 @@ Instead of using an arbitrary minimal threshold, calculate the Nash bargaining s
 
 # Uncertainty 
 
-Check out Section 7.3 of the user guide:
+1. Check out Section 7.3 of the user guide: https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/export/103/doc/userguide.pdf
 
-https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/export/103/doc/userguide.pdf
+2. Now create a domain with uncertain preferences, and use the built-in function estimateUtilityFunction for your agent. 
 
-Now create a domain with uncertain preferences, and use the built-in function estimateUtilityFunction for your agent. 
+3. Run the agent against itself, and check the logs. The logs should contain information about how well the estimated utility function matches the real utility. 
+
+The way that the estemation is implemented in the class AdditiveUtilitySpaceFactory is below:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
+	/**
+	 * A simple heuristic for estimating a discrete {@link AdditiveUtilitySpace} from a {@link BidRanking}.
+	 * Gives 0 points to all values occurring in the lowest ranked bid, 
+	 * then 1 point to all values occurring in the second lowest bid, and so on.
+	 */
+	public void estimateUsingBidRanks(BidRanking r)
+	{
+		double points = 0;
+		for (Bid b : r.getBidOrder())
+		{
+			List<Issue> issues = b.getIssues();
+			for (Issue i : issues)
+			{
+				int no = i.getNumber();
+				ValueDiscrete v = (ValueDiscrete) b.getValue(no);
+				double oldUtil = getUtility(i, v);
+				setUtility(i, v, oldUtil + points);
+			}
+			points += 1;
+		}
+		normalizeWeightsByMaxValues();
+	}
+	
+	public void normalizeWeightsByMaxValues()
+	{
+		for (Issue i : getIssues())
+		{
+			EvaluatorDiscrete evaluator = (EvaluatorDiscrete) u.getEvaluator(i);
+			evaluator.normalizeAll();
+		}
+		for (Issue i : getIssues())
+		{
+			EvaluatorDiscrete evaluator = (EvaluatorDiscrete) u.getEvaluator(i);
+			evaluator.scaleAllValuesFrom0To1();
+		}
+		u.normalizeWeights();
+	}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The full source code can be downloaded from the GENIUS website, or from here: 
+https://secure.ecs.soton.ac.uk/notes/comp6203/genius/core/uncertainty/AdditiveUtilitySpaceFactory.java 
+
+Try to understand how it works and implement your own modified version.
 
 Now you have a complete agent which works with uncertain preferences, and you can try and improve each of the components.
 
