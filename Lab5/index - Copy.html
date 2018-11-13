@@ -1,0 +1,185 @@
+              <meta charset="utf-8" emacsmode="-*- markdown -*-">
+
+                            **COMP6203: Lab #5**
+                        	Intelligent Agents
+                        _Wednesday, 14 November 2018_
+                        University of Southampton
+                        _[Go to Lab Index]("../index.html")_
+
+This lab shows how to implement a previous winner ([ANAC2016](http://web.tuat.ac.jp/~katfuji/ANAC2016/))  and got the second place in ([ANAC2017](http://web.tuat.ac.jp/~katfuji/ANAC2017/)), the international automated negotiation competition.
+
+# Theory Crash Course
+
+To get you more familiar with how to implement a more sophisticated agent, we introduce `Caduceus` agent, which got the first in 2016 and a slightly different version got the second in 2017.
+
+To learn theory in detail, later you can have a look at:
+* [The conference paper](https://link.springer.com/chapter/10.1007/978-3-319-69131-2_27) [#Gunes2017]
+* [The poster](https://tdgunes.com/prima2017poster.pdf)
+* [The presentation](https://tdgunes.com/prima2017presentation.pdf)
+
+of the Caduceus. But for this lab, the algorithm given in the next section is enough to complete the tasks.
+
+In short, Caduceus incorporates the strategies of multiple agents. We call them experts. These experts can be agents that we know that they are good in negotiation. Metaphorically, it is as if you ask help from multiple friends and try to combine their opinions.
+
+This type of combined approaches exists in:
+* Machine Learning
+    * [Ensemble Learning](https://en.wikipedia.org/wiki/Ensemble_learning)
+    * Algorithm portfolios 
+* Artificial Intelligence 
+    * Genetic Algorithms (_slightly similar_)
+    * Mixture of Experts
+
+## Caduceus IPO - _Incremental Portfolio Approach_
+
+!!! warning Simple version!
+    Here we explain a simpler version of the Caduceus without a waiting phase. In the competition, Caduceus had `a waiting phase` initially before making any actions. The extra materials above explains the phases in Caduceus, which you can have a look later for your assignment.
+
+Essentially, Caduceus has _a set of experts $A$._ 
+
+\begin{equation}
+A = \{i, ..., n \}
+\end{equation}
+
+A set of `impact weights` each assigned to the experts.
+
+\begin{equation}
+\Omega = \{\omega_i, ..., \omega_n \}
+\end{equation}
+
+Therefore, Caduceus' algorithm _IPO variation_ (a slightly easier to implement version) for generating bids is:
+
+* $B \leftarrow \{\}$
+* **for each** $i \in A$ **do**
+    * $a^{'}_i \leftarrow$ query agent $i$ with action $a$ in time $t$
+    * **if** $type(a^{'}_i) = I^{bid}$ **then**
+        * $B \leftarrow B \cup \{a^{'}_i\}$
+        * $\ell_{bid} \leftarrow \ell_{bid} + 1$
+    * **else**
+        * $\ell_{accept} \leftarrow \ell_{accept} + 1$
+* **if** $\ell_{accept}  > \ell_{bid}$ **then do action** $I^{accept}$
+* **else**
+    **do action** $I^{offer}$ with a bid $b^{'}$ from the [weighted random sample set](https://stackoverflow.com/questions/6052603/fast-weighted-random-selection-from-very-large-set-of-values) that is formed by $B$ according to $\Omega$
+
+where:
+
+* $\ell_{accept}$: the number of experts that generates _accept action_, 
+    * i.e. the number of experts that recommend accepting the offer that is on the table
+* $\ell_{bid}$: the number of experts that generates _bid action_ 
+    * i.e. the number of experts that recommend making a counter offer
+* $a^{'}_i$: action that agent i recommends to Caduceus to take
+* $I^{type}$: action type, for instance:
+    * $I^{offer}$ is making an offer 
+    * $I^{accept}$ is accepting offer that is on the table.
+
+!!! note How to determine the `impact weights`?
+    You can make multiple tournaments beforehand to determine the performance of the experts.
+
+# Task 0: Caduceus on Paper
+
+Assume that Caduceus IPO is on the negotiation table with other opponent agents, according to SAOP protocol. Caduceus has these experts:
+
+\begin{equation}
+A = \{AgentFoo, AgentBar, AgentFum\}
+\end{equation}
+
+for whom you set the `impact weights` as
+
+\begin{equation}
+\Omega = \{0.2, 0.3, 0.5\}
+\end{equation}
+
+You recieve a new offer from one of your opponents:
+
+\begin{equation}
+b_{opp_1} = (\textit{Brand: }\text{Dell},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{13}^{"}) 
+\end{equation}
+
+You ask experts for their opinions:
+
+* AgentFoo says `Accept`.
+* AgentBar says `Counter Offer`: $(\textit{Brand: }\text{HP},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{15}^{"})$
+* AgentBar says `Counter Offer`: $(\textit{Brand: }\text{Apple},\ \textit{HardDisk: }\text{1TB},\ \textit{Monitor: }\text{17}^{"})$
+
+!!! error
+    Which actions would Caduceus take? Which one is more likely?
+
+# Task 1: Implement Caduceus IPO - _Incremental Portfolio_
+
+!!! warning
+    For importing other agents just write their name somewhere in the code and the IDE will suggest the right `import` statement.
+
+!!! warning
+    Make sure the expert agents set are receiving the messages from the opponent agents.
+
+!!! warning
+    You can pick your experts from previous competitions. But be careful, if you are going to use agents since
+        * From ANAC 2016: agents protocol was set to be SAOP.
+        * From ANAC 2017: agents can access data from their past negotiations of a tournament. Check the details [here](http://web.tuat.ac.jp/~katfuji/ANAC2017/).
+        * From ANAC 2019 (upcoming): agents which can work with partially ordered preference profiles will be used and the protocol is expected to be a bilateral version of SAOP.
+
+# Task 2: Implement Caduceus CO - _Crossover_
+
+Implement _Crossover Strategy_ of Caduceus: Algorithm 1.2 without _waiting phase_ from the paper. 
+
+**********************************************************************************
+*                          +---------+--------+                                  *
+*                          |    Issue|HP      |                                  *
+*                          +---------+--------+                                  *
+*                          |    Brand|512GB   |                                  *
+*                          +---------+--------+                                  *
+*                          |HardDrive|17"     |                                  *
+*                          +---------+--------+                                  *
+*                                    ^                                           *
+*                                    |                                           *
+*                                    | combines opinions                         *
+*                                    |                                           *
+*                           +----------------+                                   *
+*             +------------>|    Caduceus    |<--------------+                   *
+*             |             +----------------+               |                   *
+*             |                      ^                       |                   *
+*             |                      |                       |                   *
+*             |                      |                       |                   *
+*             |                      |                       |                   *
+*             |w_{parsagent} = 0.35  | w_{atlas3} = 0.4      | w_{kawaii} = 0.25 *
+*+----------- | -------------------- | --------------------- | ----------+       *
+*|     b_{parsagent}            b_{atlas3}             b_{kawaii}        |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |    Brand|HP      |   |    Brand|Dell    |    |    Brand|HP      |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |HardDrive|256GB   |   |HardDrive|512GB   |    |HardDrive|1TB     |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |  Monitor|13"     |   |  Monitor|17"     |    |  Monitor|17"     |  |       *
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|            ^                      ^                       ^           |       *
+*|            |                      |                       |           |       * 
+*|  +---------+--------+   +---------+--------+    +---------+--------+  |       *
+*|  |    ParsAgent     |   |      Atlas3      |    |      Kawaii      |  |       *
+*|  +------------------+   +------------------+    +------------------+  |       *
+*|                                                                       |       *
+*|                                Experts                                |       *
+*+-----------------------------------------------------------------------+       *
+**********************************************************************************
+[Figure [fig1]: CO version of Caduceus combines experts opinions]
+
+
+!!! warning
+    The modification that you are going to do to IPO is changing how the bid is generated. In the _CO_ version you need to pick the value of each issue that is offered the most by the experts.
+
+!!! error
+    Explain how the opinions are combined (it can be deduced from the figure above).
+
+# Bonus Tasks: Further improvements
+
+* Simple: Instead of each agent having the same impact on the votes, how about using weights to vote? (They could be the same as the weights for choosing the new bid)
+* Hard: Try to come up with a heuristic to find the weight of each expert.
+
+
+# Bibliography
+[#Gunes2017]: Güneş T. D., Arditi E., and Aydoğan R., “Collective Voice of Experts in Multilateral Negotiation,” in PRIMA 2017: Principles and Practice of Multi-Agent Systems: 20th International Conference, Nice, France, October 30 – November 3, 2017, Proceedings, B. An, A. Bazzan, J. Leite, S. Villata, and L. van der Torre, Eds. Cham: Springer International Publishing, 2017, pp. 450–458.  https://link.springer.com/chapter/10.1007/978-3-319-69131-2_27
+
+<!-- Markdeep: -->
+<script>window.markdeepOptions = {"tocStyle": "medium"};</script>
+
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="../markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+
+
