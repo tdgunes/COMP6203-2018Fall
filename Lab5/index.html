@@ -11,13 +11,13 @@ Over the next two labs you will implement a simple agent which does basic oppone
 # A Preliminary Concession Strategy
 
 !!! Tip
-    Resources for helping with the implementation are available on https://github.com/tdgunes/ExampleAgent/wiki as well as the Genius user guide  (https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/export/103/doc/userguide.pdf) and the GENIUS javadoc (https://tdgunes.com/genius-9.1.1-javadoc/). If you have any  problems, feel free to post new questions on the Github wiki by creating an issue. 
+    Resources for helping with the implementation are available on https://github.com/tdgunes/ExampleAgent/wiki as well as the [Genius user guide](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/export/103/doc/userguide.pdf) and the [GENIUS javadoc](https://tdgunes.com/genius-9.1.1-javadoc/). If you have any  problems, feel free to post new questions on the Github wiki by creating an issue. 
 
 We start with the concession strategy. The concession strategy determines the target utility level at which to produce and/or accept offers. For now we will assume the agent fully knows its own preferences (disable the uncertainty in the domain when running your agent) but has no opponent model.
 
 1. Start from the example agent (i.e. a working agent which generates random offers). 
 
-2. To begin with you can use a simple linear approach to set the target utility, which starts with the highest possible utility (i.e. the utility of the best possible offer), and then concedes up to a threshold when the time limit is reached. Set this threshold using a variable (e.g. it can be the average between the highest and lowest possible utility within the set of possible offers). Feel free to use a more advanced approach, e.g. Boulware or Conceder strategy (see slides on negotiation lecture and/or literature). 
+2. To begin with, you can use a simple linear approach to set the target utility, which starts with the highest possible utility (i.e. the utility of the best possible offer), and then concedes up to a threshold when the time limit is reached. Set this threshold using a variable (e.g. it can be the average between the highest and lowest possible utility within the set of possible offers). Feel free to use a more advanced approach, e.g. Boulware or Conceder strategy (see slides on negotiation lecture and/or literature). 
 
 !!! Tip
     Note that the ExampleAgent already contains code for finding the best possible utility. 
@@ -25,7 +25,7 @@ We start with the concession strategy. The concession strategy determines the ta
 3. Select a random offer which has a minimum utility threshold (we will improve this strategy later).
 
 !!! Tip
-    The code for how to do this is here: https://github.com/tdgunes/ExampleAgent/wiki/Generating-a-random-bid-with-a-utility-threshold
+    The code for how to do this can be found [here](https://github.com/tdgunes/ExampleAgent/wiki/Generating-a-random-bid-with-a-utility-threshold)
 
 4. Offer that bid to your opponent and accept any offers received by the opponent which have a utility equal or greater than the target utility.
 
@@ -33,16 +33,16 @@ We start with the concession strategy. The concession strategy determines the ta
 
 # Opponent Modelling
 
-The approach above is very simple and does not result in very Pareto efficient agreements. A typical approach to improve this, and which used in many negotiation strategies, is to model the utility function of the opponent based on the bids received. This model gets updated as more bids are received. 
+The approach above is very simple and does not result in very Pareto efficient agreements. A typical approach to improve this, and which is used in many negotiation strategies, is to model the utility function of the opponent based on the bids received. This model gets updated as more bids are received. 
 
-The instructions are based on a simple approach from the Johny Black agent: https://secure.ecs.soton.ac.uk/notes/comp6203/papers/JohnnyBlack.pdf However, feel free to use a different approach if you had something in mind for your agent already.  
+The following instructions are based on a simple approach from the Johny Black agent, as explained in [their paper](https://secure.ecs.soton.ac.uk/notes/comp6203/papers/JohnnyBlack.pdf)). However, feel free to use a different approach if you had something in mind for your agent already.  
 
-(the full proceedings are  available here: https://link.springer.com/content/pdf/10.1007/978-3-319-51563-2.pdf )
+(the full proceedings are also available [here](https://link.springer.com/content/pdf/10.1007/978-3-319-51563-2.pdf)
 
 Read section 2.3 of the Johny Black agent paper and try to understand how they implement the opponent model. Then do the following steps:
 
 
-1. First create a double integer array which keeps track of the frequency of the issue values.  That is, for each issue, and each value you want to count how many times you received an offer with that value (see Tables 1 and 2 as examples). Make sure this works for any number of issues and values. 
+1. First create a double integer array which keeps track of the frequency of the issue values.  That is, for each issue, and each value you want to count how many times you received an offer with that value (see Tables 1 and 2 in the paper as examples). Make sure this works for any number of issues and values. 
 
 !!! Tip
     To do this you need to access information about the domain (how many issues, how many discrete values for each issue). An example of how this is done is here: https://github.com/tdgunes/ExampleAgent/wiki/Accessing-the-evaluation-of-a-value (note that you don't need the evaluation of a value at this point, but this is an example how to access the information of the domain).
@@ -52,7 +52,7 @@ Read section 2.3 of the Johny Black agent paper and try to understand how they i
 
 2. Now start populating the frequency table. That is, for each incoming bid, update the frequency table. 
 !!! Tip
-    To find out more about how the Bid object work, check the Javadoc, i.e. https://tdgunes.com/genius-9.1.1-javadoc/genius/core/Bid.html
+    To find out more about how the Bid object works, check the Javadoc, i.e. https://tdgunes.com/genius-9.1.1-javadoc/genius/core/Bid.html
 
 !!! note
     Note that you need to match the value to what you have in your table. There are various ways to do this, and requires some basic programming skills and understanding of Java.
@@ -62,20 +62,20 @@ Read section 2.3 of the Johny Black agent paper and try to understand how they i
 
 4. Now that you have the table, use the approach from the paper to compute the estimated opponent utility. 
 
-5. Again check that it works. Initially, with no information, each of the opponent bids should have equal utility. As you receive more bids from your opponent, the utility estimation should gradually improve.
+5. Check again that it works. Initially, with no information, each of the opponent bids should have equal utility. As you receive more bids from your opponent, the utility estimation should gradually improve.
 
 # Improve the Offer Generating Strategy
 
-We are now going to improve step 3 from the Concession strategy by using our opponent model. 
+We are now going to improve step 3 from the preliminary Concession strategy sketched in Section 1 by using our opponent model. 
 
-Option 1: Ideally, you would want to loop through all the bids which have a utility equal or better than the target utility for the agent, and then choose the one from that set which has highest utility for the opponent according to the opponent model. 
+**Option 1:** Ideally, you would want to loop through all the bids which have a utility equal or better than the target utility for the agent, and then choose the one from that set which has highest utility for the opponent according to the opponent model. 
 
-Option 2: Alternatively, a slightly simpler approach is using sampling, and using the same function which selects the random bid above a threshold. Instead of selecting only 1 random bid, sample n bids (where n can be set to any size), and from those bids choose the one which the highest opponent utility. 
+**Option 2:** Alternatively, a slightly simpler approach is using sampling with the same function that selects the random bid above a threshold as in Section 1. But instead of selecting only 1 random bid, sample n bids (where n can be set to any size), and from those bids choose the one which the highest opponent utility. 
 
 Implement one of the two approaches.
   
 !!! note
-    Note that, if the estimated opponent utility were to be exact, the first approach would always yield Pareto efficient bids. Explain why this is.
+    Note that, if the estimated opponent utility were to be exact, the first approach would always yield Pareto efficient bids. Explain why this is the case.
 
 Test your approach, and see if it improves the result.	
 	
@@ -85,13 +85,13 @@ Instead of using an arbitrary minimal threshold, calculate the Nash bargaining s
 
 # Uncertainty 
 
-1. Check out Section 7.3 of the user guide: https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/export/103/doc/userguide.pdf
+1. Check out [Section 7.3 of the user guide](https://tracinsy.ewi.tudelft.nl/pubtrac/Genius/export/103/doc/userguide.pdf)
 
-2. Now create a domain with uncertain preferences, and use the built-in function estimateUtilityFunction for your agent wherever you accessed the actual utility function before. 
+2. Now create a domain with uncertain preferences, and use the built-in function *estimateUtilityFunction* for your agent wherever you accessed the actual utility function before. 
 
 3. Run the agent against itself, and check the logs. The logs should contain information about how well the estimated utility function matches the real utility. 
 
-The way that the estimation is implemented in the class AdditiveUtilitySpaceFactory is below:
+The way that the estimation is implemented in the class *AdditiveUtilitySpaceFactory* is shown below:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~java
 	/**
@@ -132,8 +132,7 @@ The way that the estimation is implemented in the class AdditiveUtilitySpaceFact
 		u.normalizeWeights();
 	}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-The full source code can be downloaded from the GENIUS website, or from here: 
-https://secure.ecs.soton.ac.uk/notes/comp6203/genius/core/uncertainty/AdditiveUtilitySpaceFactory.java 
+The full source code can be downloaded from the GENIUS website, or from [here](https://secure.ecs.soton.ac.uk/notes/comp6203/genius/core/uncertainty/AdditiveUtilitySpaceFactory.java).
 
 Try to understand how it works and implement your own modified version.
 
