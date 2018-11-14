@@ -15,7 +15,7 @@ Over the next two labs you will implement a simple agent which does basic oppone
 
 We start with the concession strategy. The concession strategy determines the target utility level at which to produce and/or accept offers. For now we will assume the agent fully knows its own preferences (disable the uncertainty in the domain when running your agent) but has no opponent model.
 
-1. Start from the example agent (i.e. a working agent which generates random offers). 
+1. Start from the [example agent](https://github.com/tdgunes/ExampleAgent/blob/master/src/ExampleAgent.java) (i.e. a working agent which generates random offers). 
 
 2. To begin with, you can use a simple linear approach to set the target utility, which starts with the highest possible utility (i.e. the utility of the best possible offer), and then concedes up to a threshold when the time limit is reached. Set this threshold using a variable (e.g. it can be the average between the highest and lowest possible utility within the set of possible offers). Feel free to use a more advanced approach, e.g. Boulware or Conceder strategy (see slides on negotiation lecture and/or literature). 
 
@@ -37,7 +37,7 @@ The approach above is very simple and does not result in very Pareto efficient a
 
 The following instructions are based on a simple approach from the Johny Black agent, as explained in [their paper](https://secure.ecs.soton.ac.uk/notes/comp6203/papers/JohnnyBlack.pdf)). However, feel free to use a different approach if you had something in mind for your agent already.  
 
-(the full proceedings are also available [here](https://link.springer.com/content/pdf/10.1007/978-3-319-51563-2.pdf)
+(the full proceedings are also available [here](https://link.springer.com/content/pdf/10.1007/978-3-319-51563-2.pdf))
 
 Read section 2.3 of the Johny Black agent paper and try to understand how they implement the opponent model. Then do the following steps:
 
